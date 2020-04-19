@@ -28,7 +28,7 @@ impl Cpu {
     /// * `state` - The internal state of the Z80
     /// * `sys` - A representation of the emulated machine that has the Machine trait
     ///  
-    pub fn execute_instruction(&mut self, state: &mut State, sys: &mut dyn Machine) {
+    pub fn execute_instruction(&self, state: &mut State, sys: &mut dyn Machine) {
         if self.trace {
             let pc = state.reg.pc();
             let opcode_index = sys.peek(pc);

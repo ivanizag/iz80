@@ -1,6 +1,4 @@
 #![warn(missing_docs)]
-//#![warn(missing_doc_code_examples)]
-
 //! Z80 Emulator library that passess all ZEXALL tests
 //! 
 //! See cpuville.rs or the [iz-cpm](https://github.com/ivanizag/iz-cpm)

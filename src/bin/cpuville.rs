@@ -19,7 +19,7 @@ static TINY_BASIC: &'static [u8] = include_bytes!("rom/tinybasic2dms.bin");
 fn main() {
     let mut machine = VilleMachine::new();
     let mut state = State::new();
-    let mut cpu = Cpu::new();
+    let cpu = Cpu::new();
 
     // Init console
     let mut stdout = stdout();
