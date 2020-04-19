@@ -26,7 +26,6 @@ pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast
     }
     Opcode {
         name: full_name,
-        cycles: if fast {4} else {8}, // The one byte opcodes are faster // (HL): 15, (IX+d): 23
         action: Box::new(move |env: &mut Environment| {
             env.load_displacement(r);
 
@@ -88,7 +87,6 @@ pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast
 pub fn build_bit_r(n: u8, r: Reg8) -> Opcode {
     Opcode {
         name: format!("BIT {}, {}", n, r),
-        cycles: 8, // (HL) 12, (IX+d) 20
         action: Box::new(move |env: &mut Environment| {
             env.load_displacement(r);
 
@@ -127,7 +125,6 @@ pub fn build_set_res_r(bit: u8, r: Reg8, value: bool) -> Opcode {
     let name = if value {"SET"} else {"RES"};
     Opcode {
         name: format!("{} {}, {}", name, bit, r),
-        cycles: 8, // (HL) 15
         action: Box::new(move |env: &mut Environment| {
             env.load_displacement(r);
 
@@ -147,7 +144,6 @@ pub fn build_indexed_set_res_r(bit: u8, r: Reg8, value: bool) -> Opcode {
     let name = if value {"SET"} else {"RES"};
     Opcode {
         name: format!("LD {}, {} {}, {}", r, name, bit, Reg8::_HL),
-        cycles: 23,
         action: Box::new(move |env: &mut Environment| {
             /*
             An instruction such as LD r, RES b, (IX+d) should be interpreted as
@@ -176,7 +172,6 @@ pub fn build_indexed_set_res_r(bit: u8, r: Reg8, value: bool) -> Opcode {
 pub fn build_cpl() -> Opcode {
     Opcode {
         name: "CPL".to_string(),
-        cycles: 4,
         action: Box::new(move |env: &mut Environment| {
             let mut v = env.state.reg.get_a();
             v = !v;
@@ -192,7 +187,6 @@ pub fn build_cpl() -> Opcode {
 pub fn build_scf() -> Opcode {
     Opcode {
         name: "SCF".to_string(),
-        cycles: 4,
         action: Box::new(move |env: &mut Environment| {
             let a = env.state.reg.get_a();
 
@@ -207,7 +201,6 @@ pub fn build_scf() -> Opcode {
 pub fn build_ccf() -> Opcode {
     Opcode {
         name: "CCF".to_string(),
-        cycles: 4,
         action: Box::new(move |env: &mut Environment| {
             let a = env.state.reg.get_a();
             let c = env.state.reg.get_flag(Flag::C);
@@ -223,7 +216,6 @@ pub fn build_ccf() -> Opcode {
 pub fn build_rxd(dir: ShiftDir, name: &str) -> Opcode {
     Opcode {
         name: name.to_string(),
-        cycles: 18,
         action: Box::new(move |env: &mut Environment| {
             let mut a = env.state.reg.get_a();
             let mut phl = env.reg8_ext(Reg8::_HL);

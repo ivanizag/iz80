@@ -8,7 +8,6 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
         // Fast version
         Opcode {
             name: format!("{} A, {:?}", name, r),
-            cycles: 4,
             action: Box::new(move |env: &mut Environment| {
                 let a = env.state.reg.get_a();
                 let b = env.state.reg.get8(r);
@@ -19,7 +18,6 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
     } else {
         Opcode {
             name: format!("{} A, {:?}", name, r),
-            cycles: 4, // (HL) 7, (ix+d) 19
             action: Box::new(move |env: &mut Environment| {
                 env.load_displacement(r);
 
@@ -36,7 +34,6 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
 pub fn build_operator_a_n((op, name): (Operator, &str)) -> Opcode {
     Opcode {
         name: format!("{} A, n", name),
-        cycles: 7,
         action: Box::new(move |env: &mut Environment| {
             let a = env.state.reg.get_a();
             let b = env.advance_pc();
@@ -50,7 +47,6 @@ pub fn build_operator_a_n((op, name): (Operator, &str)) -> Opcode {
 pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Opcode {
     Opcode {
         name: format!("CP{}", postfix),
-        cycles: 16, // 21 if PC is changed
         action: Box::new(move |env: &mut Environment| {
             let a = env.state.reg.get_a();
             let b = env.reg8_ext(Reg8::_HL);

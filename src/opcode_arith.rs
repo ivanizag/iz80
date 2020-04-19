@@ -7,7 +7,6 @@ use super::registers::*;
 pub fn build_add_hl_rr(rr: Reg16) -> Opcode {
     Opcode {
         name: format!("ADD HL, {:?}", rr),
-        cycles: 11, // IX or IY: 15
         action: Box::new(move |env: &mut Environment| {
             let aa = env.index_value();
             let bb = env.reg16_ext(rr);
@@ -20,7 +19,6 @@ pub fn build_add_hl_rr(rr: Reg16) -> Opcode {
 pub fn build_adc_hl_rr(rr: Reg16) -> Opcode {
     Opcode {
         name: format!("ADC HL, {:?}", rr),
-        cycles: 15,
         action: Box::new(move |env: &mut Environment| {
             let aa = env.index_value(); // This will always be HL.
             let bb = env.reg16_ext(rr);
@@ -33,7 +31,6 @@ pub fn build_adc_hl_rr(rr: Reg16) -> Opcode {
 pub fn build_sbc_hl_rr(rr: Reg16) -> Opcode {
     Opcode {
         name: format!("SBC HL, {:?}", rr),
-        cycles: 15,
         action: Box::new(move |env: &mut Environment| {
             let aa = env.index_value(); // This will always be HL.
             let bb = env.reg16_ext(rr);
@@ -48,7 +45,6 @@ pub fn build_sbc_hl_rr(rr: Reg16) -> Opcode {
 pub fn build_inc_r(r: Reg8) -> Opcode {
     Opcode {
         name: format!("INC {}", r),
-        cycles: 4, // (HL) 11, (IX+d) 23, IXH/IXL,IYH,IYL: 8
         action: Box::new(move |env: &mut Environment| {
             env.load_displacement(r);
 
@@ -62,7 +58,6 @@ pub fn build_inc_r(r: Reg8) -> Opcode {
 pub fn build_dec_r(r: Reg8) -> Opcode {
     Opcode {
         name: format!("DEC {}", r),
-        cycles: 4, // (HL) 11, (IX+d) 23, IXH/IXL,IYH,IYL: 8
         action: Box::new(move |env: &mut Environment| {
             env.load_displacement(r);
 
@@ -78,7 +73,6 @@ pub fn build_inc_dec_rr(rr: Reg16, inc: bool) -> Opcode {
     let mnemonic = if inc {"INC"} else {"DEC"};
     Opcode {
         name: format!("{} {:?}", mnemonic, rr),
-        cycles: 6, // IX, IY: 10
         action: Box::new(move |env: &mut Environment| {
             let mut v = env.reg16_ext(rr);
             v = v.wrapping_add(delta);
@@ -92,7 +86,6 @@ pub fn build_inc_dec_rr(rr: Reg16, inc: bool) -> Opcode {
 pub fn build_neg() -> Opcode {
     Opcode {
         name: "NEG".to_string(),
-        cycles: 8,
         action: Box::new(move |env: &mut Environment| {
             let b = env.state.reg.get_a();
             let v = operator_sub(env, 0, b);
@@ -104,7 +97,6 @@ pub fn build_neg() -> Opcode {
 pub fn build_daa() -> Opcode {
     Opcode {
         name: "NEG".to_string(),
-        cycles: 4,
         action: Box::new(move |env: &mut Environment| {
             // See TUZD-4.7
             let a = env.state.reg.get_a();
