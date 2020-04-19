@@ -14,7 +14,7 @@ use std::thread;
 use std::time::Duration;
 
 use z80::cpu::Cpu;
-use z80::memory_io::*;
+use z80::machine::*;
 use z80::registers::*;
 use z80::state::State;
 
@@ -44,7 +44,6 @@ fn main() {
     machine.in_values[3] = 1; // TX Ready
 
     let trace = false;
-    cpu.trace = trace;
     loop {
         cpu.execute_instruction(&mut state, &mut machine);
 

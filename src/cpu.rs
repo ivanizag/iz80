@@ -1,11 +1,11 @@
 use super::decoder::*;
 use super::environment::*;
-use super::memory_io::*;
+use super::machine::*;
 use super::state::*;
 
 pub struct Cpu {
-    pub decoder: Decoder,
-    pub trace: bool,
+    decoder: Decoder,
+    trace: bool,
 }
 
 impl Cpu {
@@ -31,6 +31,10 @@ impl Cpu {
         }
         opcode.execute(&mut env);
         env.step();
+    }
+
+    pub fn set_trace(&mut self, trace: bool) {
+        self.trace = trace;
     }
 }
 

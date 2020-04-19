@@ -1,7 +1,7 @@
 extern crate z80;
 
 use z80::cpu::Cpu;
-use z80::memory_io::*;
+use z80::machine::*;
 use z80::registers::*;
 use z80::state::State;
 
@@ -50,7 +50,7 @@ fn text_zexall() {
 
     state.reg.set_pc(0x100);
     let trace = false;
-    cpu.trace = trace;
+    cpu.set_trace(trace);
     let mut tests_passed = 0;
     loop {
         cpu.execute_instruction(&mut state, &mut machine);

@@ -2,7 +2,7 @@ extern crate z80;
 
 use z80::cpu::Cpu;
 use z80::state::State;
-use z80::memory_io::*;
+use z80::machine::*;
 use z80::registers::*;
 
 #[test]

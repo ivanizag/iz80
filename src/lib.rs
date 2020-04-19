@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 pub mod cpu;
-pub mod memory_io;
+pub mod machine;
 pub mod registers;
 pub mod state;
 

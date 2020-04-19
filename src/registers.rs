@@ -21,7 +21,7 @@ pub enum Reg8 {
     SPL = 15,
     _HL = 16 // Invalid
 }
-pub const REG_COUNT8: usize = 16;
+const REG_COUNT8: usize = 16;
 
 
 // 16 bit registers, composed from 8 bit registers
@@ -69,7 +69,7 @@ pub struct Registers {
 }
 
 impl Registers {
-    pub fn new() -> Registers {
+    pub(crate) fn new() -> Registers {
         //Init z80 registers (TUZD-2.4)
         let mut reg = Registers {
             data: [0; REG_COUNT8],
@@ -112,7 +112,7 @@ impl Registers {
         self.data[reg as usize] = value;
     }
 
-    pub fn inc_dec8(&mut self, reg: Reg8, inc: bool) -> u8 {
+    pub(crate) fn inc_dec8(&mut self, reg: Reg8, inc: bool) -> u8 {
         let mut v = self.get8(reg);
         if inc {
             v = v.wrapping_add(1);
@@ -135,7 +135,7 @@ impl Registers {
         self.data[rr as usize] = (value >> 8) as u8;
     }
 
-    pub fn inc_dec16(&mut self, rr: Reg16, inc: bool) -> u16 {
+    pub(crate) fn inc_dec16(&mut self, rr: Reg16, inc: bool) -> u16 {
         let mut v = self.get16(rr);
         if inc {
             v = v.wrapping_add(1);
@@ -146,7 +146,7 @@ impl Registers {
         v
     }
 
-    pub fn swap(&mut self, rr: Reg16) {
+    pub(crate) fn swap(&mut self, rr: Reg16) {
         let ih = rr as usize;
         let temp = self.data[ih];
         self.data[ih] = self.shadow[ih];
@@ -178,12 +178,12 @@ impl Registers {
         }
     }
 
-    pub fn update_sz53p_flags(&mut self, reference: u8) {
+    pub(crate) fn update_sz53p_flags(&mut self, reference: u8) {
         self.update_sz53_flags(reference);
         self.update_p_flag(reference);
     }
 
-    pub fn update_sz53_flags(&mut self, reference: u8) {
+    pub(crate) fn update_sz53_flags(&mut self, reference: u8) {
         self.update_53_flags(reference);
 
         let f: &mut u8 = &mut self.data[Reg8::F as usize];
@@ -199,7 +199,7 @@ impl Registers {
         *f = (*f & !MASK_S) + (reference & MASK_S);
     }
 
-    pub fn update_53_flags(&mut self, reference: u8) {
+    pub(crate) fn update_53_flags(&mut self, reference: u8) {
         let f: &mut u8 = &mut self.data[Reg8::F as usize];
 
         // Bits 5, and 3 are copied
@@ -207,12 +207,12 @@ impl Registers {
         *f = (*f & !MASK_53) + (reference & MASK_53);
     }
 
-    pub fn update_p_flag(&mut self, reference: u8) {
+    pub(crate) fn update_p_flag(&mut self, reference: u8) {
         let bits = reference.count_ones();
         self.put_flag(Flag::P, bits % 2 == 0);
     }
 
-    pub fn update_vh_flags(&mut self, xored: u16) {
+    pub(crate) fn update_vh_flags(&mut self, xored: u16) {
         let half_bit  = (xored >> 4 & 1) != 0;
         self.put_flag(Flag::H, half_bit);
 
@@ -221,14 +221,14 @@ impl Registers {
         self.put_flag(Flag::P, carry_bit != top_xor); // As overflow flag
     }
 
-    pub fn update_cvh_flags(&mut self, xored: u16) {
+    pub(crate) fn update_cvh_flags(&mut self, xored: u16) {
         let carry_bit = (xored >> 8 & 1) != 0;
         self.put_flag(Flag::C, carry_bit);
 
         self.update_vh_flags(xored);
     }
 
-    pub fn update_ch_flags(&mut self, xored: u16) {
+    pub(crate) fn update_ch_flags(&mut self, xored: u16) {
         let carry_bit = (xored >> 8 & 1) != 0;
         self.put_flag(Flag::C, carry_bit);
 
@@ -247,11 +247,11 @@ impl Registers {
         self.pc = value;
     }
 
-    pub fn set_interrupts(&mut self, v: bool) {
+    pub(crate) fn set_interrupts(&mut self, v: bool) {
         self.iff2 = v;
     }
 
-    pub fn set_interrup_mode(&mut self, im: u8) {
+    pub(crate) fn set_interrupt_mode(&mut self, im: u8) {
         self.im = im;
     }
 }

@@ -124,7 +124,7 @@ pub fn build_im(im: u8) -> Opcode {
         name: format!("IM {}", im),
         cycles: 8,
         action: Box::new(move |env: &mut Environment| {
-            env.state.reg.set_interrup_mode(im);
+            env.state.reg.set_interrupt_mode(im);
         })
     }
 }

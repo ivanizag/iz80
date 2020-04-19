@@ -11,8 +11,4 @@ Passes the ZEXALL tests:
 cargo test --release -- --nocapture --ignored
 ```
 
-Initial support of CP/M binaries:
-```
-cargo run --bin cpm -- src/cpm/rom/TINYBAS.COM
-```
 
