@@ -7,18 +7,6 @@ use super::state::*;
 /// The Z80 cpu emulator.
 /// 
 /// Executes Z80 instructions changing the cpu State and Machine
-/// 
-/// # Example
-/// ```
-/// let mut machine = PlainMachine::new();
-/// let mut state = State::new();
-/// let mut cpu = Cpu::new();
-/// // [load code in the machine memory]
-/// 
-/// loop {
-///     cpu.execute_instruction(&mut state, &mut machine);
-/// }
-/// ```
 pub struct Cpu {
     decoder: Decoder,
     trace: bool,
