@@ -12,16 +12,12 @@ use std::time::Duration;
 
 use z80::Cpu;
 use z80::Machine;
-use z80::Reg8;
-use z80::Reg16;
 use z80::State;
 
 static TINY_BASIC: &'static [u8] = include_bytes!("rom/tinybasic2dms.bin");
-//static MONITOR: &'static [u8] = include_bytes!("rom/2K_ROM_8.bin");
-
 
 fn main() {
-    let mut machine = CpmMachine::new();
+    let mut machine = VilleMachine::new();
     let mut state = State::new();
     let mut cpu = Cpu::new();
 
@@ -41,39 +37,9 @@ fn main() {
     state.reg.set_pc(0x00);
     machine.in_values[3] = 1; // TX Ready
 
-    let trace = false;
     loop {
         cpu.execute_instruction(&mut state, &mut machine);
 
-        if trace {
-            // CPU registers
-            println!("PC({:04x}) AF({:04x}) BC({:04x}) DE({:04x}) HL({:04x}) SP({:04x}) IX({:04x}) IY({:04x}) Flags({:08b})",
-                state.reg.pc(),
-                state.reg.get16(Reg16::AF),
-                state.reg.get16(Reg16::BC),
-                state.reg.get16(Reg16::DE),
-                state.reg.get16(Reg16::HL),
-                state.reg.get16(Reg16::SP),
-                state.reg.get16(Reg16::IX),
-                state.reg.get16(Reg16::IY),
-                state.reg.get8(Reg8::F)
-            );
-
-            // Test state
-            let addr = 0x1d80 as u16;
-            print!("Cpm state 0x{:04x}: ", addr);
-            for i in 0..0x10 {
-                print!("{:02x} ", machine.peek(addr + i));
-            }
-            println!("");
-        }
-
-        if state.reg.pc() == 0x0000 {
-            println!("");
-            break;
-        }
-
-        
         if machine.out_called {
             match machine.out_port {
                 2 => {
@@ -130,7 +96,7 @@ fn spawn_stdin_channel() -> Receiver<u8> {
     rx
 }
 
-struct CpmMachine {
+struct VilleMachine {
     mem: [u8; 65536],
     in_values: [u8; 256],
     in_called: bool,
@@ -140,9 +106,9 @@ struct CpmMachine {
     out_value: u8
 }
 
-impl CpmMachine {
-    pub fn new() -> CpmMachine {
-        CpmMachine {
+impl VilleMachine {
+    pub fn new() -> VilleMachine {
+        VilleMachine {
             mem: [0; 65536],
             in_values: [0; 256],
             out_called: false,
@@ -154,7 +120,7 @@ impl CpmMachine {
     }
 }
 
-impl Machine for CpmMachine {
+impl Machine for VilleMachine {
     fn peek(&self, address: u16) -> u8 {
         self.mem[address as usize]
     }
