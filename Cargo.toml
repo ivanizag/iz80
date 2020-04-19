@@ -3,7 +3,10 @@ name = "iz80"
 version = "0.1.0"
 authors = ["Ivan Izaguirre <ivanizag@gmail.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+description = "Z80 emulator"
+homepage = "https://github.com/ivanizag/iz80"
+repository = "https://github.com/ivanizag/iz80"
+readme = "README.md"
 
 [dependencies]
