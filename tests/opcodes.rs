@@ -18,7 +18,7 @@ fn test_two_opcodes() {
 
     println!("Registers: {:?}", state.reg);
 
-    assert_eq!(0x34, state.reg.get_a());
+    assert_eq!(0x34, state.reg.a());
 }
 
 #[test]

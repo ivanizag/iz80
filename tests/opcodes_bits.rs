@@ -15,7 +15,7 @@ fn test_rrca_fast() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0b11001001, state.reg.get_a());
+    assert_eq!(0b11001001, state.reg.a());
     assert_eq!(true, state.reg.get_flag(Flag::C));
 }
 
@@ -32,7 +32,7 @@ fn test_rrc_a() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0b11001001, state.reg.get_a());
+    assert_eq!(0b11001001, state.reg.a());
     assert_eq!(true, state.reg.get_flag(Flag::C));
 }
 
@@ -100,7 +100,7 @@ fn test_rlc_a() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0b00100110, state.reg.get_a());
+    assert_eq!(0b00100110, state.reg.a());
     assert_eq!(false, state.reg.get_flag(Flag::C));
 }
 
@@ -168,7 +168,7 @@ fn test_bit_a() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0b00010010, state.reg.get_a());
+    assert_eq!(0b00010010, state.reg.a());
     assert_eq!(false, state.reg.get_flag(Flag::Z));
 }
 
@@ -217,7 +217,7 @@ fn test_cpl() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0xc2, state.reg.get_a());
+    assert_eq!(0xc2, state.reg.a());
 }
 
 #[test]
@@ -234,7 +234,7 @@ fn test_rld() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0xac, state.reg.get_a());
+    assert_eq!(0xac, state.reg.a());
     assert_eq!(0xdb, sys.peek(0xccdd));
 }
 
@@ -252,6 +252,6 @@ fn test_rrd() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0xad, state.reg.get_a());
+    assert_eq!(0xad, state.reg.a());
     assert_eq!(0xbc, sys.peek(0xccdd));
 }

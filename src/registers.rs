@@ -87,7 +87,7 @@ impl Registers {
     }
 
     #[inline]
-    pub fn get_a(&self) -> u8 {
+    pub fn a(&self) -> u8 {
         self.data[Reg8::A as usize]
     }
 

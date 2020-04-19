@@ -68,7 +68,7 @@ fn test_ld_a_b() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0x23, state.reg.get_a());
+    assert_eq!(0x23, state.reg.a());
 }
 
 #[test]

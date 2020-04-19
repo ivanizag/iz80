@@ -9,7 +9,7 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
         Opcode {
             name: format!("{} A, {:?}", name, r),
             action: Box::new(move |env: &mut Environment| {
-                let a = env.state.reg.get_a();
+                let a = env.state.reg.a();
                 let b = env.state.reg.get8(r);
                 let v = op(env, a, b);
                 env.state.reg.set_a(v);
@@ -21,7 +21,7 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
             action: Box::new(move |env: &mut Environment| {
                 env.load_displacement(r);
 
-                let a = env.state.reg.get_a();
+                let a = env.state.reg.a();
                 let b = env.reg8_ext(r);
                 let v = op(env, a, b);
 
@@ -35,7 +35,7 @@ pub fn build_operator_a_n((op, name): (Operator, &str)) -> Opcode {
     Opcode {
         name: format!("{} A, n", name),
         action: Box::new(move |env: &mut Environment| {
-            let a = env.state.reg.get_a();
+            let a = env.state.reg.a();
             let b = env.advance_pc();
             let v = op(env, a, b);
 
@@ -48,7 +48,7 @@ pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
     Opcode {
         name: format!("CP{}", postfix),
         action: Box::new(move |env: &mut Environment| {
-            let a = env.state.reg.get_a();
+            let a = env.state.reg.a();
             let b = env.reg8_ext(Reg8::_HL);
             let c_bak = env.state.reg.get_flag(Flag::C);
             operator_cp(env, a, b);

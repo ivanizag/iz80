@@ -87,7 +87,7 @@ pub fn build_neg() -> Opcode {
     Opcode {
         name: "NEG".to_string(),
         action: Box::new(move |env: &mut Environment| {
-            let b = env.state.reg.get_a();
+            let b = env.state.reg.a();
             let v = operator_sub(env, 0, b);
             env.state.reg.set_a(v);
         })
@@ -99,7 +99,7 @@ pub fn build_daa() -> Opcode {
         name: "NEG".to_string(),
         action: Box::new(move |env: &mut Environment| {
             // See TUZD-4.7
-            let a = env.state.reg.get_a();
+            let a = env.state.reg.a();
             let hi = a >> 4;
             let lo = a & 0xf;
 

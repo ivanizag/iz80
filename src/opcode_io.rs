@@ -40,7 +40,7 @@ pub fn build_out_n_a() -> Opcode {
     Opcode {
         name: "OUT (n), A".to_string(),
         action: Box::new(move |env: &mut Environment| {
-            let a = env.state.reg.get_a();
+            let a = env.state.reg.a();
             let address = ((a as u16) << 8) + env.advance_pc() as u16;
             env.port_out(address, a);
         })
@@ -78,7 +78,7 @@ pub fn build_in_a_n() -> Opcode {
     Opcode {
         name: "IN A, (n)".to_string(),
         action: Box::new(move |env: &mut Environment| {
-            let a = env.state.reg.get_a();
+            let a = env.state.reg.a();
             let address = ((a as u16) << 8) + env.advance_pc() as u16;
             let value = env.port_in(address);
             env.state.reg.set_a(value);

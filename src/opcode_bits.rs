@@ -173,7 +173,7 @@ pub fn build_cpl() -> Opcode {
     Opcode {
         name: "CPL".to_string(),
         action: Box::new(move |env: &mut Environment| {
-            let mut v = env.state.reg.get_a();
+            let mut v = env.state.reg.a();
             v = !v;
             env.state.reg.set_a(v);
 
@@ -188,7 +188,7 @@ pub fn build_scf() -> Opcode {
     Opcode {
         name: "SCF".to_string(),
         action: Box::new(move |env: &mut Environment| {
-            let a = env.state.reg.get_a();
+            let a = env.state.reg.a();
 
             env.state.reg.set_flag(Flag::C);
             env.state.reg.clear_flag(Flag::H);
@@ -202,7 +202,7 @@ pub fn build_ccf() -> Opcode {
     Opcode {
         name: "CCF".to_string(),
         action: Box::new(move |env: &mut Environment| {
-            let a = env.state.reg.get_a();
+            let a = env.state.reg.a();
             let c = env.state.reg.get_flag(Flag::C);
 
             env.state.reg.put_flag(Flag::C, !c);
@@ -217,7 +217,7 @@ pub fn build_rxd(dir: ShiftDir, name: &str) -> Opcode {
     Opcode {
         name: name.to_string(),
         action: Box::new(move |env: &mut Environment| {
-            let mut a = env.state.reg.get_a();
+            let mut a = env.state.reg.a();
             let mut phl = env.reg8_ext(Reg8::_HL);
             // a = 0xWX, phl = 0xYZ
             match dir {

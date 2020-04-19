@@ -15,7 +15,7 @@ fn test_neg_a() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0x01, state.reg.get_a());
+    assert_eq!(0x01, state.reg.a());
 }
 
 #[test]
@@ -29,7 +29,7 @@ fn test_inc_a() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0xa5, state.reg.get_a());
+    assert_eq!(0xa5, state.reg.a());
 }
 
 #[test]
@@ -43,7 +43,7 @@ fn test_inc_a_overflow() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0x00, state.reg.get_a());
+    assert_eq!(0x00, state.reg.a());
 }
 
 #[test]
@@ -71,7 +71,7 @@ fn test_dec_a() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0xa3, state.reg.get_a());
+    assert_eq!(0xa3, state.reg.a());
 }
 
 #[test]
@@ -85,7 +85,7 @@ fn test_dec_a_underflow() {
 
     cpu.execute_instruction(&mut state, &mut sys);
 
-    assert_eq!(0xff, state.reg.get_a());
+    assert_eq!(0xff, state.reg.a());
 }
 
 #[test]
