@@ -17,7 +17,7 @@ See [cpuville.rs](src/bin/cpuville.rs) or the CP/M 2.2 emulator [iz-cpm](https:/
 
 To run ths example, execute: `cargo run --bin simplest`
  
-```
+```rust
 use iz80::*;
 
 fn main() {
@@ -47,16 +47,5 @@ fn main() {
         }
     }
 }
-
-
-
-Runs Tiny Basic (version from [cpuville.com](http://cpuville.com/Code/Tiny-BASIC.html):
 ```
-cargo run --bin cpuville
-```
-
-Passes the ZEXALL tests:
-```
-```
-
 
