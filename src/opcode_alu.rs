@@ -24,7 +24,7 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
                 env.load_displacement(r);
 
                 let a = env.state.reg.get_a();
-                let b = env.get_reg(r);
+                let b = env.reg8_ext(r);
                 let v = op(env, a, b);
 
                 env.state.reg.set_a(v);
@@ -53,7 +53,7 @@ pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
         cycles: 16, // 21 if PC is changed
         action: Box::new(move |env: &mut Environment| {
             let a = env.state.reg.get_a();
-            let b = env.get_reg(Reg8::_HL);
+            let b = env.reg8_ext(Reg8::_HL);
             let c_bak = env.state.reg.get_flag(Flag::C);
             operator_cp(env, a, b);
             let bc = env.state.reg.inc_dec16(Reg16::BC, false /*decrement*/);
@@ -73,10 +73,10 @@ pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
             env.state.reg.set_flag(Flag::N);
             env.state.reg.put_flag(Flag::C, c_bak); // C unchanged
 
-            //let hl_ = env.get_reg(Reg8::_HL);
+            //let hl_ = env.reg8_ext(Reg8::_HL);
             if repeat && bc != 0 &&  a != b {
                 // Back to redo the instruction
-                let pc = env.state.reg.get_pc().wrapping_sub(2);
+                let pc = env.state.reg.pc().wrapping_sub(2);
                 env.state.reg.set_pc(pc);
             }
         })

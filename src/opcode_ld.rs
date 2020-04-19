@@ -80,7 +80,7 @@ pub fn build_ld_r_r(dst: Reg8, src: Reg8, special: bool) -> Opcode {
                 let value = if dst == Reg8::_HL {
                     env.state.reg.get8(src)
                 } else {
-                    env.get_reg(src)
+                    env.reg8_ext(src)
                 };
                 if src == Reg8::_HL {
                     env.state.reg.set8(dst, value);
@@ -175,7 +175,7 @@ pub fn build_ld_sp_hl() -> Opcode {
         name: "LD SP, HL".to_string(),
         cycles: 6, // IX/IY: 10
         action: Box::new(move |env: &mut Environment| {
-            let value = env.get_reg16(Reg16::HL);
+            let value = env.reg16_ext(Reg16::HL);
             env.set_reg16(Reg16::SP, value);
         })
     }
@@ -187,7 +187,7 @@ pub fn build_ld_pnn_rr(rr: Reg16, fast: bool) -> Opcode {
         cycles: if fast {20} else {16},  // HL(fast): 16 , IX/IY: 20,
         action: Box::new(move |env: &mut Environment| {
             let address = env.advance_immediate16();
-            let value = env.get_reg16(rr);
+            let value = env.reg16_ext(rr);
             env.sys.poke16(address, value);
         })
     }
@@ -246,7 +246,7 @@ pub fn build_ex_psp_hl() -> Opcode {
         action: Box::new(move |env: &mut Environment| {
             let address = env.state.reg.get16(Reg16::SP);
 
-            let temp = env.get_reg16(Reg16::HL);
+            let temp = env.reg16_ext(Reg16::HL);
             env.set_reg16(Reg16::HL, env.sys.peek16(address));
             env.sys.poke16(address, temp);
         })         
@@ -258,7 +258,7 @@ pub fn build_ld_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
         name: format!("LD{}", postfix),
         cycles: 16, // 21 if PC is changed
         action: Box::new(move |env: &mut Environment| {
-            let value = env.get_reg(Reg8::_HL);
+            let value = env.reg8_ext(Reg8::_HL);
             let address = env.state.reg.get16(Reg16::DE);
             env.sys.poke(address, value);
 
@@ -278,7 +278,7 @@ pub fn build_ld_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
 
             if repeat && bc != 0 {
                 // Back to redo the instruction
-                let pc = env.state.reg.get_pc().wrapping_sub(2);
+                let pc = env.state.reg.pc().wrapping_sub(2);
                 env.state.reg.set_pc(pc);
             }
         })         

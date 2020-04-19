@@ -238,7 +238,7 @@ impl Registers {
     }
 
     #[inline]
-    pub fn get_pc(&self) -> u16 {
+    pub fn pc(&self) -> u16 {
         self.pc
     }
 

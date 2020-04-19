@@ -50,7 +50,7 @@ fn main() {
         if trace {
             // CPU registers
             println!("PC({:04x}) AF({:04x}) BC({:04x}) DE({:04x}) HL({:04x}) SP({:04x}) IX({:04x}) IY({:04x}) Flags({:08b})",
-                state.reg.get_pc(),
+                state.reg.pc(),
                 state.reg.get16(Reg16::AF),
                 state.reg.get16(Reg16::BC),
                 state.reg.get16(Reg16::DE),
@@ -70,7 +70,7 @@ fn main() {
             println!("");
         }
 
-        if state.reg.get_pc() == 0x0000 {
+        if state.reg.pc() == 0x0000 {
             println!("");
             break;
         }

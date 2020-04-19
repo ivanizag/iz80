@@ -21,7 +21,7 @@ impl Opcode {
 
     pub fn disasm(&self, env: &Environment) -> String {
         let name = format!("{} {}",
-            env.get_index_description(), self.name);
+            env.index_description(), self.name);
 
         if self.name.contains("nn") {
             // Immediate argument 16 bits
@@ -102,7 +102,7 @@ pub fn build_push_rr(rr: Reg16) -> Opcode {
         name: format!("PUSH {:?}", rr),
         cycles: 11, // IX/IY: 15
         action: Box::new(move |env: &mut Environment| {
-            let value = env.get_reg16(rr);
+            let value = env.reg16_ext(rr);
             env.push(value);
         })
     }

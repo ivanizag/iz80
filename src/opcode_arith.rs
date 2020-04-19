@@ -9,8 +9,8 @@ pub fn build_add_hl_rr(rr: Reg16) -> Opcode {
         name: format!("ADD HL, {:?}", rr),
         cycles: 11, // IX or IY: 15
         action: Box::new(move |env: &mut Environment| {
-            let aa = env.get_index_value();
-            let bb = env.get_reg16(rr);
+            let aa = env.index_value();
+            let bb = env.reg16_ext(rr);
             let vv = operator_add16(env, aa, bb);
             env.set_reg16(Reg16::HL, vv);
         })
@@ -22,8 +22,8 @@ pub fn build_adc_hl_rr(rr: Reg16) -> Opcode {
         name: format!("ADC HL, {:?}", rr),
         cycles: 15,
         action: Box::new(move |env: &mut Environment| {
-            let aa = env.get_index_value(); // This will always be HL.
-            let bb = env.get_reg16(rr);
+            let aa = env.index_value(); // This will always be HL.
+            let bb = env.reg16_ext(rr);
             let vv = operator_adc16(env, aa, bb);
             env.state.reg.set16(Reg16::HL, vv);
         })
@@ -35,8 +35,8 @@ pub fn build_sbc_hl_rr(rr: Reg16) -> Opcode {
         name: format!("SBC HL, {:?}", rr),
         cycles: 15,
         action: Box::new(move |env: &mut Environment| {
-            let aa = env.get_index_value(); // This will always be HL.
-            let bb = env.get_reg16(rr);
+            let aa = env.index_value(); // This will always be HL.
+            let bb = env.reg16_ext(rr);
             let vv = operator_sbc16(env, aa, bb);
             env.state.reg.set16(Reg16::HL, vv);
         })
@@ -52,7 +52,7 @@ pub fn build_inc_r(r: Reg8) -> Opcode {
         action: Box::new(move |env: &mut Environment| {
             env.load_displacement(r);
 
-            let a = env.get_reg(r);
+            let a = env.reg8_ext(r);
             let v = operator_inc(env, a);
             env.set_reg(r, v);
         })
@@ -66,7 +66,7 @@ pub fn build_dec_r(r: Reg8) -> Opcode {
         action: Box::new(move |env: &mut Environment| {
             env.load_displacement(r);
 
-            let a = env.get_reg(r);
+            let a = env.reg8_ext(r);
             let v = operator_dec(env, a);
             env.set_reg(r, v);
         })
@@ -80,7 +80,7 @@ pub fn build_inc_dec_rr(rr: Reg16, inc: bool) -> Opcode {
         name: format!("{} {:?}", mnemonic, rr),
         cycles: 6, // IX, IY: 10
         action: Box::new(move |env: &mut Environment| {
-            let mut v = env.get_reg16(rr);
+            let mut v = env.reg16_ext(rr);
             v = v.wrapping_add(delta);
             env.set_reg16(rr, v);
             // Note: flags not affected on the 16 bit INC and DEC

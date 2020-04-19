@@ -16,19 +16,19 @@ impl <'a> Environment<'_> {
     }
 
     pub fn peek_pc(&self) -> u8 {
-        let pc = self.state.reg.get_pc();
+        let pc = self.state.reg.pc();
         self.sys.peek(pc)
     }
 
     pub fn advance_pc(&mut self) -> u8 {
-        let pc = self.state.reg.get_pc();
+        let pc = self.state.reg.pc();
         let value = self.sys.peek(pc);
         self.state.reg.set_pc(pc.wrapping_add(1));
         value
     }
 
     pub fn peek16_pc(&self) -> u16 {
-        let pc = self.state.reg.get_pc();
+        let pc = self.state.reg.pc();
         self.sys.peek16(pc)
     }
 
@@ -85,7 +85,7 @@ impl <'a> Environment<'_> {
         self.state.index_changed = false;
     }
 
-    pub fn get_index_description(&self) -> String {
+    pub fn index_description(&self) -> String {
         if self.state.index == Reg16::HL {
             "".to_string()
         } else if self.state.displacement_loaded {
@@ -120,11 +120,11 @@ impl <'a> Environment<'_> {
         }
     }
 
-    pub fn get_index_value(& self) -> u16 {
+    pub fn index_value(& self) -> u16 {
         self.state.reg.get16(self.state.index)
     }
 
-    pub fn get_index_address(&self) -> u16 {
+    pub fn index_address(&self) -> u16 {
         // Pseudo register (HL), (IX+d), (IY+d)
         let address = self.state.reg.get16(self.state.index);
         if self.is_alt_index() {
@@ -154,15 +154,15 @@ impl <'a> Environment<'_> {
         }
     }
 
-    pub fn get_reg(& self, reg: Reg8) -> u8 {
+    pub fn reg8_ext(& self, reg: Reg8) -> u8 {
         if reg == Reg8::_HL {
-            self.sys.peek(self.get_index_address())
+            self.sys.peek(self.index_address())
         } else {
             self.state.reg.get8(self.translate_reg(reg))
         }
     }
 
-    pub fn get_reg16(& self, rr: Reg16) -> u16 {
+    pub fn reg16_ext(& self, rr: Reg16) -> u16 {
         if rr == Reg16::HL {
             self.state.reg.get16(self.state.index)
         } else {
@@ -172,7 +172,7 @@ impl <'a> Environment<'_> {
 
     pub fn set_reg(&mut self, reg: Reg8, value: u8) {
         if reg == Reg8::_HL {
-            self.sys.poke(self.get_index_address(), value);
+            self.sys.poke(self.index_address(), value);
         } else {
             self.state.reg.set8(self.translate_reg(reg), value);
         }

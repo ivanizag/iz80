@@ -18,7 +18,7 @@ impl Cpu {
 
     pub fn execute_instruction(&mut self, state: &mut State, sys: &mut dyn Machine) {
         if self.trace {
-            let pc = state.reg.get_pc();
+            let pc = state.reg.pc();
             let opcode_index = sys.peek(pc);
             //print!("==== {:04x}: {:02x} ", pc, opcode_index);
             print!("==== {:04x}: {:02x} {:02x} {:02x} ", pc, opcode_index,

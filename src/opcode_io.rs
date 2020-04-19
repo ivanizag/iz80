@@ -123,7 +123,7 @@ pub fn build_in_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
 
             if repeat && b != 0 {
                 // Back to redo the instruction
-                let pc = env.state.reg.get_pc().wrapping_sub(2);
+                let pc = env.state.reg.pc().wrapping_sub(2);
                 env.state.reg.set_pc(pc);
             }
                 })
@@ -141,7 +141,7 @@ pub fn build_out_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> O
             let b = env.state.reg.inc_dec8(Reg8::B, false /* decrement */);
 
             // We won't have IX and IY cases to consider
-            let value = env.get_reg(Reg8::_HL);
+            let value = env.reg8_ext(Reg8::_HL);
             env.port_out(address, value);
             env.state.reg.inc_dec16(Reg16::HL, inc);
 
@@ -155,7 +155,7 @@ pub fn build_out_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> O
 
             if repeat && b != 0 {
                 // Back to redo the instruction
-                let pc = env.state.reg.get_pc().wrapping_sub(2);
+                let pc = env.state.reg.pc().wrapping_sub(2);
                 env.state.reg.set_pc(pc);
             }
         })

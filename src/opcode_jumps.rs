@@ -45,7 +45,7 @@ pub fn build_jr_eq((flag, value, name): (Flag, bool, &str)) -> Opcode {
 
 
 fn relative_jump(env: &mut Environment, offset: u8) {
-    let mut pc = env.state.reg.get_pc();
+    let mut pc = env.state.reg.pc();
     pc = pc.wrapping_add(offset as i8 as i16 as u16);
     pc = pc.wrapping_add(-2 as i16 as u16); // Assume rel jump opcode took 2 bytes
     env.state.reg.set_pc(pc);
@@ -82,7 +82,7 @@ pub fn build_jp_hl() -> Opcode {
         cycles: 4, // IX/IY: 9
         action: Box::new(move |env: &mut Environment| {
             // Note: no displacement added to the index
-            let address = env.get_index_value();
+            let address = env.index_value();
             env.state.reg.set_pc(address);
         })
     }
@@ -95,7 +95,7 @@ pub fn build_call() -> Opcode {
         cycles: 10,
         action: Box::new(move |env: &mut Environment| {
             let address = env.advance_immediate16();
-            env.push(env.state.reg.get_pc());
+            env.push(env.state.reg.pc());
             env.state.reg.set_pc(address);
         })
     }
@@ -108,7 +108,7 @@ pub fn build_call_eq((flag, value, name): (Flag, bool, &str)) -> Opcode {
         action: Box::new(move |env: &mut Environment| {
             let address = env.advance_immediate16();
             if env.state.reg.get_flag(flag) == value {
-                env.push(env.state.reg.get_pc());
+                env.push(env.state.reg.pc());
                 env.state.reg.set_pc(address);
             }
         })
@@ -121,7 +121,7 @@ pub fn build_rst(d: u8) -> Opcode {
         cycles: 11,
         action: Box::new(move |env: &mut Environment| {
             let address = d as u16;
-            env.push(env.state.reg.get_pc());
+            env.push(env.state.reg.pc());
             env.state.reg.set_pc(address);
         })
     }
