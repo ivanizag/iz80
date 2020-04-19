@@ -1,5 +1,10 @@
 # iz80
 
+[![Build Status](https://github.com/ivanizag/iz80/workflows/Build/badge.svg)](https://github.com/ivanizag/iz80/actions?workflow=Build)
+[![Crates](https://img.shields.io/crates/v/iz80.svg)](https://crates.io/crates/iz80)
+[![Documentation](https://docs.rs/iz80/badge.svg)](https://docs.rs/iz80)
+
+
 Z80 Emulator library for RUST. It passes all the tests of the ZEZALL suite. No cycle emulation accuracy, runs as fast as it can.
 
 To run the ZEXALL test suite:
