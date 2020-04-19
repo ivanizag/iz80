@@ -1,7 +1,13 @@
 use super::registers::*;
 
+/// Internal state of the CPU
+/// 
+/// Stores the state of the registers and additional hidden execution
+/// state of the CPU.
 pub struct State {
+    /// Values of the Z80 registers
     pub reg: Registers,
+    /// Halt state of the CPU
     pub halted: bool,
     // Alternate index management
     pub(crate) index: Reg16, // Using HL, IX or IY
@@ -11,6 +17,7 @@ pub struct State {
 }
 
 impl State {
+    /// Returns the initial state of a Z80 on power up
     pub fn new() -> State {
         State {
             reg: Registers::new(),

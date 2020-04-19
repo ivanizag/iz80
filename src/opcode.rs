@@ -9,10 +9,6 @@ pub struct Opcode {
 }
 
 impl Opcode {
-    fn new (name: String, action: Box<OpcodeFn>) -> Opcode {
-        Opcode {name, action}
-    }
-
     pub fn execute(&self, env: &mut Environment) {
         (self.action)(env);
     }

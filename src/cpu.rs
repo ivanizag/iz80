@@ -4,12 +4,28 @@ use super::machine::*;
 use super::registers::*;
 use super::state::*;
 
+/// The Z80 cpu emulator.
+/// 
+/// Executes Z80 instructions changing the cpu State and Machine
+/// 
+/// # Example
+/// ```
+/// let mut machine = PlainMachine::new();
+/// let mut state = State::new();
+/// let mut cpu = Cpu::new();
+/// // [load code in the machine memory]
+/// 
+/// loop {
+///     cpu.execute_instruction(&mut state, &mut machine);
+/// }
+/// ```
 pub struct Cpu {
     decoder: Decoder,
     trace: bool,
 }
 
 impl Cpu {
+    /// Returns a Cpu instance
     pub fn new() -> Cpu {
         Cpu {
             decoder: Decoder::new(),
@@ -17,6 +33,13 @@ impl Cpu {
         }
     }
 
+    /// Executes a single Z80 instruction
+    /// 
+    /// # Arguments
+    /// 
+    /// * `state` - The internal state of the Z80
+    /// * `sys` - A representation of the emulated machine that has the Machine trait
+    ///  
     pub fn execute_instruction(&mut self, state: &mut State, sys: &mut dyn Machine) {
         if self.trace {
             let pc = state.reg.pc();
@@ -50,6 +73,12 @@ impl Cpu {
         }
     }
 
+    /// Activates or deactivates traces of the instruction executed and
+    /// the state of the registers.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `trace` - A bool defining the trace state to set
     pub fn set_trace(&mut self, trace: bool) {
         self.trace = trace;
     }

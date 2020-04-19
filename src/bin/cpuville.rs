@@ -10,9 +10,9 @@ use std::sync::mpsc::TryRecvError;
 use std::thread;
 use std::time::Duration;
 
-use z80::Cpu;
-use z80::Machine;
-use z80::State;
+use iz80::Cpu;
+use iz80::Machine;
+use iz80::State;
 
 static TINY_BASIC: &'static [u8] = include_bytes!("rom/tinybasic2dms.bin");
 
@@ -30,11 +30,11 @@ fn main() {
     let code = TINY_BASIC;
     let size = code.len();
     for i in 0..size {
-        machine.poke(0x00 + i as u16, code[i]);
+        machine.poke(0x0000 + i as u16, code[i]);
     }
 
     // Init
-    state.reg.set_pc(0x00);
+    state.reg.set_pc(0x0000);
     machine.in_values[3] = 1; // TX Ready
 
     loop {

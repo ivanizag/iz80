@@ -1,12 +1,7 @@
-use z80::cpu::Cpu;
-use z80::machine::*;
-use z80::registers::*;
-use z80::state::State;
-
+use iz80::*;
 
 //static ZEXDOC: &'static [u8] = include_bytes!("res/zexdoc.com");
 static ZEXALL: &'static [u8] = include_bytes!("res/zexall.com");
-
 
 #[test]
 #[ignore]
@@ -106,14 +101,14 @@ fn text_zexall() {
 }
 
 struct ZexMachine {
-    mem: [u8; PLAIN_MEMORY_SIZE],
+    mem: [u8; 65536],
     bdos_called: bool
 }
 
 impl ZexMachine {
     pub fn new() -> ZexMachine {
         ZexMachine {
-            mem: [0; PLAIN_MEMORY_SIZE],
+            mem: [0; 65536],
             bdos_called: false
         }
     }

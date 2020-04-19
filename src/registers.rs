@@ -1,51 +1,83 @@
 use std::fmt;
 
-// 8 bit registers
+/// 8 bit registers
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Reg8 {
+    /// 8 bit register A
     A = 0,
+    /// 8 bit register F, can be accessed vif the flags methods
     F = 1, // Flags
+    /// 8 bit register B
     B = 2,
+    /// 8 bit register C
     C = 3,
+    /// 8 bit register D
     D = 4,
+    /// 8 bit register E
     E = 5,
+    /// 8 bit register H, high byte of HL
     H = 6,
+    /// 8 bit register L, low byte of HL
     L = 7,
+    /// 8 bit register I
     I = 8,
+    /// 8 bit register R
     R = 9,
+    /// High byte of IX
     IXH = 10,
+    /// Low byte of IX
     IXL = 11,
+    /// High byte of IY
     IYH = 12,
+    /// Low byte of IY
     IYL = 13,
+    /// High byte of SP
     SPH = 14,
+    /// Low byte of SP
     SPL = 15,
-    _HL = 16 // Invalid
+    /// Pseudo register, has to be replaced by (HL) 
+     _HL = 16 // Invalid
 }
 const REG_COUNT8: usize = 16;
 
 
-// 16 bit registers, composed from 8 bit registers
+/// 16 bit registers, composed from 8 bit registers
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Reg16 {
+    /// 16 but register AF 
     AF = Reg8::A as isize,
+    /// 16 but register BC 
     BC = Reg8::B as isize,
+    /// 16 but register DE 
     DE = Reg8::D as isize,
+    /// 16 but register HL 
     HL = Reg8::H as isize,
+    /// 16 but register IX 
     IX = Reg8::IXH as isize,
+    /// 16 but register IY 
     IY = Reg8::IYH as isize,
+    /// 16 but register SP
     SP = Reg8::SPH as isize
 }
 
-// Flags, see http://www.z80.info/z80sflag.htm
+/// Z80 flags
 #[derive(Copy, Clone, Debug)]
 pub enum Flag {
+    /// Carry flag
     C  = 1,
+    /// Negative flag
     N  = 2,
+    /// Parity or overflow flag
     P  = 4, // P/V
+    /// Undocumented third flag
     _3 = 8,
+    /// Half carry flag
     H  = 16,
+    /// Undocumented fifth flag
     _5 = 32,
+    /// Zero flag
     Z  = 64,
+    /// Sign flag
     S  = 128
 }
 
@@ -58,6 +90,7 @@ impl fmt::Display for Reg8 {
     }
 }
 
+/// Z80 internal register values
 #[derive(Debug)]
 pub struct Registers {
     data: [u8; REG_COUNT8],
@@ -86,16 +119,19 @@ impl Registers {
         reg
     }
 
+    /// Returns the value of the A register
     #[inline]
     pub fn a(&self) -> u8 {
         self.data[Reg8::A as usize]
     }
 
+    /// Sets the A register
     #[inline]
     pub fn set_a(&mut self, value: u8) {
         self.data[Reg8::A as usize] = value;
     }
 
+    /// Returns the value of an 8 bit register
     #[inline]
     pub fn get8(&self, reg: Reg8) -> u8 {
         if reg == Reg8::_HL {
@@ -104,6 +140,7 @@ impl Registers {
         self.data[reg as usize]
     }
 
+    /// Sets the value of an 8 bit register
     #[inline]
     pub fn set8(&mut self, reg: Reg8, value: u8) {
         if reg == Reg8::_HL {
@@ -123,12 +160,15 @@ impl Registers {
         v
     }
 
+    /// Returns the value of a 16 bit register
     #[inline]
     pub fn get16(&self, rr: Reg16) -> u16 {
         self.data[rr as usize +1] as u16
         + ((self.data[rr as usize] as u16) << 8)
     }
 
+    /// Sets the value of a 16 bit register. Changes the
+    /// value of the two underlying 8 bit registers.
     #[inline]
     pub fn set16(&mut self, rr: Reg16, value: u16) {
         self.data[rr as usize +1] = value as u8;
@@ -158,18 +198,22 @@ impl Registers {
         self.shadow[il] = temp;
     }
 
+    /// Returns the value of a flag
     pub fn get_flag(&self, flag: Flag) -> bool {
         self.get8(Reg8::F) & flag as u8 != 0
     }
 
+    /// Sets a flag. Sets the value to true
     pub fn set_flag(&mut self, flag: Flag) {
         self.data[Reg8::F as usize] |= flag as u8;
     }
 
+    /// Clears a flag. Sets the value to false
     pub fn clear_flag(&mut self, flag: Flag) {
         self.data[Reg8::F as usize] &= !(flag as u8);
     }
 
+    /// Sets the value of a flag
     pub fn put_flag(&mut self, flag: Flag, value: bool) {
         if value {
             self.set_flag(flag);
@@ -237,11 +281,13 @@ impl Registers {
 
     }
 
+    /// Returns the program counter
     #[inline]
     pub fn pc(&self) -> u16 {
         self.pc
     }
 
+    /// Changes the program counter
     #[inline]
     pub fn set_pc(&mut self, value: u16) {
         self.pc = value;

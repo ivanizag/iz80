@@ -1,7 +1,4 @@
-use z80::cpu::Cpu;
-use z80::state::State;
-use z80::machine::*;
-use z80::registers::*;
+use iz80::*;
 
 #[test]
 fn test_rrca_fast() {
