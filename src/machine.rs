@@ -16,17 +16,16 @@ pub trait Machine {
     fn port_out(&mut self, address: u16, value: u8);
 }
 
-pub const PLAIN_MEMORY_SIZE: usize = 65536;
 pub struct PlainMachine {
-    mem: [u8; PLAIN_MEMORY_SIZE],
-    io: [u8; PLAIN_MEMORY_SIZE]
+    mem: [u8; 65536],
+    io: [u8; 65536]
 }
 
 impl PlainMachine {
     pub fn new() -> PlainMachine {
         PlainMachine {
-            mem: [0; PLAIN_MEMORY_SIZE],
-            io: [0; PLAIN_MEMORY_SIZE]
+            mem: [0; 65536],
+            io: [0; 65536]
         }
     }
 }

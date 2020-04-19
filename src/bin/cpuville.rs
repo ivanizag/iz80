@@ -3,9 +3,6 @@
 http://cpuville.com/Code/CPM-on-a-new-computer.html
 http://cpuville.com/Code/Tiny-BASIC.html
 */
-
-extern crate z80;
-
 use std::io::*;
 use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
@@ -13,10 +10,11 @@ use std::sync::mpsc::TryRecvError;
 use std::thread;
 use std::time::Duration;
 
-use z80::cpu::Cpu;
-use z80::machine::*;
-use z80::registers::*;
-use z80::state::State;
+use z80::Cpu;
+use z80::Machine;
+use z80::Reg8;
+use z80::Reg16;
+use z80::State;
 
 static TINY_BASIC: &'static [u8] = include_bytes!("rom/tinybasic2dms.bin");
 //static MONITOR: &'static [u8] = include_bytes!("rom/2K_ROM_8.bin");
@@ -133,7 +131,7 @@ fn spawn_stdin_channel() -> Receiver<u8> {
 }
 
 struct CpmMachine {
-    mem: [u8; PLAIN_MEMORY_SIZE],
+    mem: [u8; 65536],
     in_values: [u8; 256],
     in_called: bool,
     in_port: u8,
@@ -145,7 +143,7 @@ struct CpmMachine {
 impl CpmMachine {
     pub fn new() -> CpmMachine {
         CpmMachine {
-            mem: [0; PLAIN_MEMORY_SIZE],
+            mem: [0; 65536],
             in_values: [0; 256],
             out_called: false,
             out_port: 0,

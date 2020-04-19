@@ -1,9 +1,10 @@
 #![allow(dead_code)]
 
-pub mod cpu;
-pub mod machine;
-pub mod registers;
-pub mod state;
+mod cpu;
+mod machine;
+mod registers;
+mod state;
+
 
 mod decoder;
 mod environment;
@@ -15,3 +16,8 @@ mod opcode_io;
 mod opcode_jumps;
 mod opcode_ld;
 mod operators;
+
+pub use cpu::Cpu;
+pub use machine::Machine;
+pub use registers::*;
+pub use state::State;

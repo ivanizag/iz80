@@ -1,5 +1,3 @@
-extern crate z80;
-
 use z80::cpu::Cpu;
 use z80::machine::*;
 use z80::registers::*;
