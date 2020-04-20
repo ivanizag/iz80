@@ -12,14 +12,12 @@ use std::time::Duration;
 
 use iz80::Cpu;
 use iz80::Machine;
-use iz80::State;
 
 static TINY_BASIC: &'static [u8] = include_bytes!("rom/tinybasic2dms.bin");
 
 fn main() {
     let mut machine = VilleMachine::new();
-    let mut state = State::new();
-    let cpu = Cpu::new();
+    let mut cpu = Cpu::new();
 
     // Init console
     let mut stdout = stdout();
@@ -34,11 +32,11 @@ fn main() {
     }
 
     // Init
-    state.reg.set_pc(0x0000);
+    cpu.registers().set_pc(0x0000);
     machine.in_values[3] = 1; // TX Ready
 
     loop {
-        cpu.execute_instruction(&mut state, &mut machine);
+        cpu.execute_instruction(&mut machine);
 
         if machine.out_called {
             match machine.out_port {

@@ -28,7 +28,6 @@ use iz80::*;
 fn main() {
     // Prepare the device
     let mut machine = PlainMachine::new();
-    let mut state = State::new();
     let mut cpu = Cpu::new();
     cpu.set_trace(true);
 
@@ -41,12 +40,12 @@ fn main() {
     }
 
     // Run emulation
-    state.reg.set_pc(0x0000);
+    cpu.registers().set_pc(0x0000);
     loop {
-        cpu.execute_instruction(&mut state, &mut machine);
+        cpu.execute_instruction(&mut machine);
 
         // Examine Machine state to update the hosting device as needed.
-        if state.reg.a() == 0x10 {
+        if cpu.registers().a() == 0x10 {
             // Let's stop
             break;
         }

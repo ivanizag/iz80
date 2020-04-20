@@ -10,10 +10,10 @@ pub struct State {
     /// Halt state of the CPU
     pub halted: bool,
     // Alternate index management
-    pub(crate) index: Reg16, // Using HL, IX or IY
-    pub(crate) displacement: i8, // Used for (IX+d) and (iY+d)
-    pub(crate) displacement_loaded: bool, // TODO: remove
-    pub(crate) index_changed: bool, // Use the index change for the next opcode, reset afterwards
+    pub index: Reg16, // Using HL, IX or IY
+    pub displacement: i8, // Used for (IX+d) and (iY+d)
+    pub displacement_loaded: bool, // TODO: remove
+    pub index_changed: bool, // Use the index change for the next opcode, reset afterwards
 }
 
 impl State {

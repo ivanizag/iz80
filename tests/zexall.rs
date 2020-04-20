@@ -7,7 +7,6 @@ static ZEXALL: &'static [u8] = include_bytes!("res/zexall.com");
 #[ignore]
 fn text_zexall() {
     let mut machine = ZexMachine::new();
-    let mut state = State::new();
     let mut cpu = Cpu::new();
 
     // Load program
@@ -41,12 +40,12 @@ fn text_zexall() {
     
     }
 
-    state.reg.set_pc(0x100);
+    cpu.registers().set_pc(0x100);
     let trace = false;
     cpu.set_trace(trace);
     let mut tests_passed = 0;
     loop {
-        cpu.execute_instruction(&mut state, &mut machine);
+        cpu.execute_instruction(&mut machine);
 
         if trace {
             // Test state
@@ -58,20 +57,20 @@ fn text_zexall() {
             println!("");
         }
 
-        if state.reg.pc() == 0x0000 {
+        if cpu.registers().pc() == 0x0000 {
             println!("");
             break;
         }
 
         if machine.bdos_called {
-            match state.reg.get8(Reg8::C) {
+            match cpu.registers().get8(Reg8::C) {
                 2 => {
                     // C_WRITE
-                    print!("{}", state.reg.get8(Reg8::E));
+                    print!("{}", cpu.registers().get8(Reg8::E));
                 },
                 9 => {
                     // C_WRITE_STR
-                    let mut address = state.reg.get16(Reg16::DE);
+                    let mut address = cpu.registers().get16(Reg16::DE);
                     let mut msg = String::new();
                     loop {
                         let ch = machine.peek(address) as char;
