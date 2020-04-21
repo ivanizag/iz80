@@ -38,8 +38,8 @@ fn main() {
     loop {
         cpu.execute_instruction(&mut machine);
 
-        if machine.out_called {
-            match machine.out_port {
+        if let Some(port) = machine.out_port {
+            match port {
                 2 => {
                     print!("{}", machine.out_value as char);
                     stdout.flush().unwrap();
@@ -47,18 +47,18 @@ fn main() {
                 3 => {},
                 _ => panic!("BDOS command not implemented")
             }
-            machine.out_called = false;
+            machine.out_port = None;
         }
 
-        if machine.in_called {
-            match machine.in_port {
+        if let Some(port) = machine.in_port {
+            match port {
                 2 => {
                     in_char_waiting = false;
                 },
                 3 => {},
                 _ => panic!("BDOS command not implemented")
             }
-            machine.in_called = false;
+            machine.in_port = None;
 
             // Avoid 100% CPU usage waiting for input.
             thread::sleep(Duration::from_millis(1));  
@@ -97,10 +97,8 @@ fn spawn_stdin_channel() -> Receiver<u8> {
 struct VilleMachine {
     mem: [u8; 65536],
     in_values: [u8; 256],
-    in_called: bool,
-    in_port: u8,
-    out_called: bool,
-    out_port: u8,
+    in_port: Option<u8>,
+    out_port: Option<u8>,
     out_value: u8
 }
 
@@ -109,11 +107,9 @@ impl VilleMachine {
         VilleMachine {
             mem: [0; 65536],
             in_values: [0; 256],
-            out_called: false,
-            out_port: 0,
+            out_port: None,
             out_value: 0,
-            in_called: false,
-            in_port: 0
+            in_port: None
         }
     }
 }
@@ -132,16 +128,14 @@ impl Machine for VilleMachine {
         if value != 1 {
             //print!("Port {:04x} in {:02x}\n", address, value);
         }
-        self.in_port = address as u8;
-        self.in_called = true;
+        self.in_port = Some(address as u8);
         value
     }
 
     fn port_out(&mut self, address: u16, value: u8) {
         //print!("Port {:04x} out {:02x} {}\n", address, value, value as char);
-        self.out_port = address as u8;
+        self.out_port = Some(address as u8);
         self.out_value = value;
-        self.out_called = true;
     }
 }
 
