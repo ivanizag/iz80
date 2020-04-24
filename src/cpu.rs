@@ -30,25 +30,17 @@ impl Cpu {
     /// * `sys` - A representation of the emulated machine that has the Machine trait
     ///  
     pub fn execute_instruction(&mut self, sys: &mut dyn Machine) {
-        if self.trace {
-            let pc = self.state.reg.pc();
-            let opcode_index = sys.peek(pc);
-            //print!("==== {:04x}: {:02x} ", pc, opcode_index);
-            print!("==== {:04x}: {:02x} {:02x} {:02x} ", pc, opcode_index,
-                sys.peek(pc+1), sys.peek(pc+2));
-        }
-
+        let pc = self.state.reg.pc();
         let mut env = Environment::new(&mut self.state, sys);
         let opcode = self.decoder.decode(&mut env);
         if self.trace {
-            println!("{}", opcode.disasm(&mut env));
+            print!("==> {:04x}: {:20}", pc, opcode.disasm(&mut env));
         }
         opcode.execute(&mut env);
         env.step();
 
         if self.trace {
-            // CPU registers
-            println!("PC({:04x}) AF({:04x}) BC({:04x}) DE({:04x}) HL({:04x}) SP({:04x}) IX({:04x}) IY({:04x}) Flags({:08b})",
+            print!(" PC:{:04x} AF:{:04x} BC:{:04x} DE:{:04x} HL:{:04x} SP:{:04x} IX:{:04x} IY:{:04x} Flags:{:08b}",
                 self.state.reg.pc(),
                 self.state.reg.get16(Reg16::AF),
                 self.state.reg.get16(Reg16::BC),
@@ -59,6 +51,8 @@ impl Cpu {
                 self.state.reg.get16(Reg16::IY),
                 self.state.reg.get8(Reg8::F)
             );
+            println!(" [{:02x} {:02x} {:02x}]", sys.peek(pc+1),
+                sys.peek(pc+1), sys.peek(pc+2));
         }
     }
 
@@ -75,6 +69,11 @@ impl Cpu {
     /// Returns a Registers struct to read and write on the Z80 registers
     pub fn registers(&mut self) -> &mut Registers {
         &mut self.state.reg
+    }
+
+    /// Returns if the Cpu has executed a HALT
+    pub fn is_halted(&self) -> bool {
+        self.state.halted
     }
 }
 
