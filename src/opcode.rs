@@ -29,7 +29,8 @@ impl Opcode {
             name.replace("n", &n_str)
         } else if self.name.contains("d") {
             // Immediate argument 8 bits signed
-            let d = env.peek_pc() as i8;
+            // In assembly it's shown with 2 added as if it were from the opcode pc.
+            let d = env.peek_pc() as i8 as i16 + 2;
             let d_str = format!("{:+x}", d);
             name.replace("d", &d_str)
         } else {

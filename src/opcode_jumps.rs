@@ -44,7 +44,6 @@ pub fn build_jr_eq((flag, value, name): (Flag, bool, &str)) -> Opcode {
 fn relative_jump(env: &mut Environment, offset: u8) {
     let mut pc = env.state.reg.pc();
     pc = pc.wrapping_add(offset as i8 as i16 as u16);
-    pc = pc.wrapping_add(-2 as i16 as u16); // Assume rel jump opcode took 2 bytes
     env.state.reg.set_pc(pc);
 }
 

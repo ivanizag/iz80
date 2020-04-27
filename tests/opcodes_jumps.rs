@@ -5,13 +5,13 @@ fn test_djnz_jump() {
     let mut sys = PlainMachine::new();
     let mut cpu = Cpu::new();
 
-    sys.poke(0x0000, 0x10);  // DJNZ +$06
+    sys.poke(0x0000, 0x10);  // DJNZ +$08
     sys.poke(0x0001, 0x06); 
     cpu.registers().set8(Reg8::B, 0x23);
 
     cpu.execute_instruction(&mut sys);
     assert_eq!(0x22, cpu.registers().get8(Reg8::B));
-    assert_eq!(0x0006, cpu.registers().pc());
+    assert_eq!(0x0008, cpu.registers().pc());
 }
 
 #[test]
@@ -19,7 +19,7 @@ fn test_djnz_no_jump() {
     let mut sys = PlainMachine::new();
     let mut cpu = Cpu::new();
 
-    sys.poke(0x0000, 0x10);  // DJNZ +$06
+    sys.poke(0x0000, 0x10);  // DJNZ +$08
     sys.poke(0x0001, 0x06); 
     cpu.registers().set8(Reg8::B, 0x01);
 
@@ -34,7 +34,7 @@ fn test_jr_z_jump() {
     let mut cpu = Cpu::new();
 
     sys.poke(0x0000, 0x10);  // JR -$02
-    sys.poke(0x0001, 0xfe); 
+    sys.poke(0x0001, 0xfc); 
     cpu.registers().set_flag(Flag::Z);
 
     cpu.execute_instruction(&mut sys);
