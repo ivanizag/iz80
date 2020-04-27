@@ -20,7 +20,7 @@ cargo run --bin cpuville
 ## Usage
 See [cpuville.rs](src/bin/cpuville.rs) or the CP/M 2.2 emulator [iz-cpm](https://github.com/ivanizag/iz-cpm) for more usage examples.
 
-To run ths example, execute: `cargo run --bin simplest`
+To run this example, execute: `cargo run --bin simplest`
  
 ```rust
 use iz80::*;
