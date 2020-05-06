@@ -121,9 +121,7 @@ pub fn build_daa() -> Opcode {
             let new_cf = hi6;
 
             env.state.reg.set_a(new_a);
-            env.state.reg.update_sz53p_flags(new_a);
-            env.state.reg.put_flag(Flag::H, new_hf);
-            env.state.reg.put_flag(Flag::C, new_cf);
+            env.state.reg.update_daa_flags(new_a, new_hf, new_cf);
             // N unchanged
         })
     }

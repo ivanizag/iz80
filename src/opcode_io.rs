@@ -55,8 +55,7 @@ pub fn build_in_r_c(r: Reg8) -> Opcode {
             let value = env.port_in(address);
             env.state.reg.set8(r, value);
 
-            env.state.reg.clear_flag(Flag::N);
-            env.state.reg.update_sz53p_flags(value);
+            env.state.reg.update_bits_in_flags(value);
         })
     }
 }
@@ -68,8 +67,7 @@ pub fn build_in_0_c() -> Opcode {
             let address = env.state.reg.get16(Reg16::BC);
             let value = env.port_in(address);
 
-            env.state.reg.clear_flag(Flag::N);
-            env.state.reg.update_sz53p_flags(value);
+            env.state.reg.update_bits_in_flags(value);
         })
     }
 }
@@ -108,11 +106,7 @@ pub fn build_in_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
             let mut j = env.state.reg.get8(Reg8::C) as u16;
             j = if inc {j+1} else {j-1};
             let k = value as u16 + (j & 0xff);
-            env.state.reg.update_sz53_flags(b);
-            env.state.reg.put_flag(Flag::H, k>255);
-            env.state.reg.update_p_flag(k as u8 & 7 ^ b);
-            env.state.reg.put_flag(Flag::N, value >> 7 == 1);
-            env.state.reg.put_flag(Flag::C, k>255);
+            env.state.reg.update_block_flags(value, k, b);
 
             if repeat && b != 0 {
                 // Back to redo the instruction
@@ -139,11 +133,7 @@ pub fn build_out_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> O
 
             // TUZD-4.3
             let k = value as u16 + env.state.reg.get8(Reg8::L) as u16;
-            env.state.reg.update_sz53_flags(b);
-            env.state.reg.put_flag(Flag::H, k>255);
-            env.state.reg.update_p_flag(k as u8 & 7 ^ b);
-            env.state.reg.put_flag(Flag::N, value >> 7 == 1);
-            env.state.reg.put_flag(Flag::C, k>255);
+            env.state.reg.update_block_flags(value, k, b);
 
             if repeat && b != 0 {
                 // Back to redo the instruction

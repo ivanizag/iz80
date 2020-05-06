@@ -222,13 +222,32 @@ impl Registers {
         }
     }
 
-    pub(crate) fn update_sz53p_flags(&mut self, reference: u8) {
-        self.update_sz53_flags(reference);
-        self.update_p_flag(reference);
+
+
+    // Only for add18
+    pub(crate) fn update_ch_flags(&mut self, xored: u16) {
+        let carry_bit = (xored >> 8 & 1) != 0;
+        self.put_flag(Flag::C, carry_bit);
+
+        let half_bit  = (xored >> 4 & 1) != 0;
+        self.put_flag(Flag::H, half_bit);
     }
 
-    pub(crate) fn update_sz53_flags(&mut self, reference: u8) {
-        self.update_53_flags(reference);
+    fn update_p_flag(&mut self, reference: u8) {
+        let bits = reference.count_ones();
+        self.put_flag(Flag::P, bits % 2 == 0);
+    }
+
+    pub(crate) fn update_undocumented_flags(&mut self, reference: u8) {
+        let f: &mut u8 = &mut self.data[Reg8::F as usize];
+
+        // Bits 5, and 3 are copied
+        const MASK_53: u8 = Flag::_5 as u8 + Flag::_3 as u8;
+        *f = (*f & !MASK_53) + (reference & MASK_53);
+    }
+
+    fn update_sz53_flags(&mut self, reference: u8) {
+        self.update_undocumented_flags(reference);
 
         let f: &mut u8 = &mut self.data[Reg8::F as usize];
         // Zero
@@ -243,41 +262,62 @@ impl Registers {
         *f = (*f & !MASK_S) + (reference & MASK_S);
     }
 
-    pub(crate) fn update_53_flags(&mut self, reference: u8) {
-        let f: &mut u8 = &mut self.data[Reg8::F as usize];
+// sz5h3[pv]nc
 
-        // Bits 5, and 3 are copied
-        const MASK_53: u8 = Flag::_5 as u8 + Flag::_3 as u8;
-        *f = (*f & !MASK_53) + (reference & MASK_53);
+    //sz5h3vnc
+    pub(crate) fn update_arithmetic_flags(&mut self, reference: u8, xored: u16, neg: bool) {
+        // TUZD-8.6
+        let carry_bit = (xored >> 8 & 1) != 0;
+        self.put_flag(Flag::C, carry_bit);
+
+        self.update_inc_dec_flags(reference, xored, neg);
     }
 
-    pub(crate) fn update_p_flag(&mut self, reference: u8) {
-        let bits = reference.count_ones();
-        self.put_flag(Flag::P, bits % 2 == 0);
-    }
+    // sz5h3vn
+    pub(crate) fn update_inc_dec_flags(&mut self, reference: u8, xored: u16, neg: bool) {
+        self.update_sz53_flags(reference);
 
-    pub(crate) fn update_vh_flags(&mut self, xored: u16) {
         let half_bit  = (xored >> 4 & 1) != 0;
         self.put_flag(Flag::H, half_bit);
 
         let carry_bit = (xored >> 8 & 1) != 0;
         let top_xor   = (xored >> 7 & 1) != 0;
         self.put_flag(Flag::P, carry_bit != top_xor); // As overflow flag
+
+        self.put_flag(Flag::N, neg);
     }
 
-    pub(crate) fn update_cvh_flags(&mut self, xored: u16) {
-        let carry_bit = (xored >> 8 & 1) != 0;
-        self.put_flag(Flag::C, carry_bit);
+    pub(crate) fn update_logic_flags(&mut self, reference: u8, is_and: bool) {
+        self.update_sz53_flags(reference);
 
-        self.update_vh_flags(xored);
+        self.update_p_flag(reference);
+        self.clear_flag(Flag::C);
+        self.clear_flag(Flag::N);
+        self.put_flag(Flag::H, is_and);
     }
 
-    pub(crate) fn update_ch_flags(&mut self, xored: u16) {
-        let carry_bit = (xored >> 8 & 1) != 0;
-        self.put_flag(Flag::C, carry_bit);
+    pub(crate) fn update_block_flags(&mut self, reference: u8, k: u16, counter: u8) {
+        // TUZD-4.3
+        self.update_sz53_flags(counter);
 
-        let half_bit  = (xored >> 4 & 1) != 0;
-        self.put_flag(Flag::H, half_bit);
+        self.put_flag(Flag::H, k>255);
+        self.update_p_flag(k as u8 & 7 ^ counter);
+        self.put_flag(Flag::N, reference >> 7 == 1);
+        self.put_flag(Flag::C, k>255);
+    }
+
+    pub(crate) fn update_bits_in_flags(&mut self, reference: u8) {
+        self.update_sz53_flags(reference);
+        self.update_p_flag(reference);
+        self.clear_flag(Flag::H);
+        self.clear_flag(Flag::N);
+    }
+
+    pub(crate) fn update_daa_flags(&mut self, reference: u8, hf: bool, cf:bool) {
+        self.update_sz53_flags(reference);
+        self.update_p_flag(reference);
+        self.put_flag(Flag::H, hf);
+        self.put_flag(Flag::C, cf);
 
     }
 

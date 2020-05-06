@@ -1,17 +1,21 @@
 use iz80::*;
 
-//static ZEXDOC: &'static [u8] = include_bytes!("res/zexdoc.com");
-static ZEXALL: &'static [u8] = include_bytes!("res/zexall.com");
+/*
+8080/8085 CPU Exerciser by Ian Bartholomew and Frank Cringles
+*/
 
-#[test]
+
+
+static CODE: &'static [u8] = include_bytes!("res/8080EX1.COM");
+
+//#[test]
 #[ignore]
-fn test_zexall() {
+fn test_ex8080() {
     let mut machine = ZexMachine::new();
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu8080::new();
 
     // Load program
-    //let code = ZEXDOC;
-    let code = ZEXALL;
+    let code = CODE;
     let size = code.len();
     for i in 0..size {
         machine.poke(0x100 + i as u16, code[i]);

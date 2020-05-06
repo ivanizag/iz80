@@ -76,9 +76,9 @@ pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast
             env.state.reg.clear_flag(Flag::H);
             env.state.reg.clear_flag(Flag::N);
             if fast {
-                env.state.reg.update_53_flags(v);
+                env.state.reg.update_undocumented_flags(v);
             } else {
-                env.state.reg.update_sz53p_flags(v);
+                env.state.reg.update_bits_in_flags(v);
             }
         })
     }
@@ -93,7 +93,7 @@ pub fn build_bit_r(n: u8, r: Reg8) -> Opcode {
             let v = env.reg8_ext(r);
             let z = v & (1<<n);
             env.state.reg.put_flag(Flag::S, (z & 0x80) != 0);
-            env.state.reg.update_53_flags(v); // TUZD-4.1, copy bits from reg
+            env.state.reg.update_undocumented_flags(v); // TUZD-4.1, copy bits from reg
             env.state.reg.put_flag(Flag::Z, z == 0);
             env.state.reg.set_flag(Flag::H);
             env.state.reg.put_flag(Flag::P, z == 0);
@@ -108,7 +108,7 @@ pub fn build_bit_r(n: u8, r: Reg8) -> Opcode {
                 plus the displacement).
                 */
                 let address = env.index_address();
-                env.state.reg.update_53_flags((address >> 8) as u8);
+                env.state.reg.update_undocumented_flags((address >> 8) as u8);
 
                 // Exceptions for (HL) TUZD-4-1
                 /* Things get more bizarre with the BIT n,(HL)
@@ -179,7 +179,7 @@ pub fn build_cpl() -> Opcode {
 
             env.state.reg.set_flag(Flag::H);
             env.state.reg.set_flag(Flag::N);
-            env.state.reg.update_53_flags(v);
+            env.state.reg.update_undocumented_flags(v);
         })
     }
 }
@@ -193,7 +193,7 @@ pub fn build_scf() -> Opcode {
             env.state.reg.set_flag(Flag::C);
             env.state.reg.clear_flag(Flag::H);
             env.state.reg.clear_flag(Flag::N);
-            env.state.reg.update_53_flags(a);
+            env.state.reg.update_undocumented_flags(a);
         })
     }
 }
@@ -208,7 +208,7 @@ pub fn build_ccf() -> Opcode {
             env.state.reg.put_flag(Flag::C, !c);
             env.state.reg.put_flag(Flag::H, c);
             env.state.reg.clear_flag(Flag::N);
-            env.state.reg.update_53_flags(a);
+            env.state.reg.update_undocumented_flags(a);
         })
     }
 }
@@ -237,9 +237,7 @@ pub fn build_rxd(dir: ShiftDir, name: &str) -> Opcode {
             env.state.reg.set_a(a);
             env.set_reg(Reg8::_HL, phl);
 
-            env.state.reg.clear_flag(Flag::H);
-            env.state.reg.clear_flag(Flag::N);
-            env.state.reg.update_sz53p_flags(a);
+            env.state.reg.update_bits_in_flags(a);
         })
     }
 }

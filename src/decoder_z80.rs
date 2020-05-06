@@ -15,17 +15,17 @@ use super::environment::*;
     http://z80-heaven.wikidot.com/instructions-set
 */
 
-pub struct Decoder {
+pub struct DecoderZ80 {
     no_prefix: [Option<Opcode>; 256],
     prefix_cb: [Option<Opcode>; 256],
     prefix_cb_indexed: [Option<Opcode>; 256],
     prefix_ed: [Option<Opcode>; 256],
 }
 
-impl Decoder {
-    pub fn new() -> Decoder {
+impl DecoderZ80 {
+    pub fn new() -> DecoderZ80 {
 
-        let mut decoder = Decoder {
+        let mut decoder = DecoderZ80 {
             no_prefix: [
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,

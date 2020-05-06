@@ -1,23 +1,23 @@
-use super::decoder_z80::*;
+use super::decoder_8080::*;
 use super::environment::*;
 use super::machine::*;
 use super::registers::*;
 use super::state::*;
 
-/// The Z80 cpu emulator.
+/// The 8080 cpu emulator.
 /// 
-/// Executes Z80 instructions changing the cpu State and Machine
-pub struct Cpu {
-    decoder: DecoderZ80,
+/// Executes 8080 instructions changing the cpu State and Machine
+pub struct Cpu8080 {
+    decoder: Decoder8080,
     state: State,
     trace: bool,
 }
 
-impl Cpu {
+impl Cpu8080 {
     /// Returns a Cpu instance
-    pub fn new() -> Cpu {
-        Cpu {
-            decoder: DecoderZ80::new(),
+    pub fn new() -> Cpu8080 {
+        Cpu8080 {
+            decoder: Decoder8080::new(),
             state: State::new(),
             trace: false
         }
