@@ -13,7 +13,7 @@
 //!fn main() {
 //!    // Prepare the device
 //!    let mut machine = PlainMachine::new();
-//!    let mut cpu = Cpu::new();
+//!    let mut cpu = Cpu::new(); // Or Cpu8080::new()
 //!    cpu.set_trace(true);
 //!
 //!    // Load program inline or from a file with:
@@ -29,7 +29,7 @@
 //!    loop {
 //!        cpu.execute_instruction(&mut machine);
 //!
-//!        // Examine Machine state to update the hosting device as needed.
+//!        // Examine machine state to update the hosting device as needed.
 //!        if cpu.registers().a() == 0x10 {
 //!            // Let's stop
 //!            break;

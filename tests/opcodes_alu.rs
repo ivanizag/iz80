@@ -1,7 +1,7 @@
 use iz80::*;
 
 #[test]
-fn test_CP_A() {
+fn test_cp_a() {
     let mut sys = PlainMachine::new();
     let mut cpu = Cpu8080::new();
 
@@ -16,7 +16,7 @@ fn test_CP_A() {
 }
 
 #[test]
-fn test_CP_A_2() {
+fn test_cp_a_2() {
     let mut sys = PlainMachine::new();
     let mut cpu = Cpu8080::new();
 

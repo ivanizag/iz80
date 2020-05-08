@@ -11,6 +11,7 @@ To run the ZEXALL test suite for Zilog Z80:
 ```shell
 cargo test --release -- --nocapture --ignored --test zexall
 ```
+The test suite was taken from https://github.com/anotherlin/z80emu
 
 To run the EX8080 test suite for Intel 8080:
 
@@ -37,7 +38,7 @@ use iz80::*;
 fn main() {
     // Prepare the device
     let mut machine = PlainMachine::new();
-    let mut cpu = Cpu::new();
+    let mut cpu = Cpu::new(); // Or Cpu8080::new()
     cpu.set_trace(true);
 
     // Load program inline or from a file with:
@@ -53,7 +54,7 @@ fn main() {
     loop {
         cpu.execute_instruction(&mut machine);
 
-        // Examine Machine state to update the hosting device as needed.
+        // Examine machine state to update the hosting device as needed.
         if cpu.registers().a() == 0x10 {
             // Let's stop
             break;
@@ -61,3 +62,8 @@ fn main() {
     }
 }
 ```
+
+## Links
+
+- The ZEXALL test suite for Z80 was taken from https://github.com/anotherlin/z80emu
+- The EX8080 test suite for Intel 8080 was taken from https://github.com/begoon/i8080-core

@@ -19,7 +19,7 @@ fn main() {
     loop {
         cpu.execute_instruction(&mut machine);
 
-        // Examine Machine state to update the hosting device as needed.
+        // Examine machine state to update the hosting device as needed.
         if cpu.registers().a() == 0x10 {
             // Let's stop
             break;
