@@ -4,14 +4,13 @@
 [![Crates](https://img.shields.io/crates/v/iz80.svg)](https://crates.io/crates/iz80)
 [![Documentation](https://docs.rs/iz80/badge.svg)](https://docs.rs/iz80)
 
-Zilog Z80 and Intel 8080 eemulator library for RUST. It passes all the tests of the ZEZALL suite. No cycle emulation accuracy, runs as fast as it can.
+Zilog Z80 and Intel 8080 emulator library for RUST. It passes all the tests of the ZEZALL suite. No cycle emulation accuracy, runs as fast as it can.
 
 To run the ZEXALL test suite for Zilog Z80:
 
 ```shell
 cargo test --release -- --nocapture --ignored --test zexall
 ```
-The test suite was taken from https://github.com/anotherlin/z80emu
 
 To run the EX8080 test suite for Intel 8080:
 
