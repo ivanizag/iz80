@@ -35,7 +35,7 @@ fn test_ex8080() {
 
     // Patch to run a single test
     let run_single_test = false;
-    let single_test = 11;
+    let single_test = 3;
     if run_single_test {
         let mut test_start = machine.peek16(0x0120);
         test_start += single_test*2;
@@ -99,7 +99,7 @@ fn test_ex8080() {
     if run_single_test {
         assert_eq!(1, tests_passed);
     } else {
-        assert_eq!(67, tests_passed);
+        assert_eq!(25, tests_passed);
     }
 }
 

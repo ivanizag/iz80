@@ -96,7 +96,7 @@ pub fn build_neg() -> Opcode {
 
 pub fn build_daa() -> Opcode {
     Opcode {
-        name: "NEG".to_string(),
+        name: "DAA".to_string(),
         action: Box::new(move |env: &mut Environment| {
             // See TUZD-4.7
             let a = env.state.reg.a();
@@ -122,6 +122,34 @@ pub fn build_daa() -> Opcode {
 
             env.state.reg.set_a(new_a);
             env.state.reg.update_daa_flags(new_a, new_hf, new_cf);
+            // N unchanged
+        })
+    }
+}
+
+pub fn build_daa8080() -> Opcode {
+    Opcode {
+        name: "DAA".to_string(),
+        action: Box::new(move |env: &mut Environment| {
+            // See TUZD-4.7
+            let a = env.state.reg.a();
+            let hi = a >> 4;
+            let lo = a & 0xf;
+
+            let cf = env.state.reg.get_flag(Flag::C);
+            let hf = env.state.reg.get_flag(Flag::H);
+
+            let lo6 = hf || (lo > 9);
+            let hi6 = cf || (hi > 9) || (hi == 9 && lo > 9);
+            let diff = if lo6 {6} else {0}
+                + if hi6 {6<<4} else {0};
+            //let new_a = a.wrapping_add(diff);
+
+            let new_a = operator_add(env, a, diff);
+            env.state.reg.set_a(new_a);
+            env.state.reg.put_flag(Flag::C, cf || hi6);
+
+            // env.state.reg.update_daa_flags(new_a, new_hf, new_cf);
             // N unchanged
         })
     }
