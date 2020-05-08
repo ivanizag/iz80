@@ -117,11 +117,14 @@ pub fn build_daa() -> Opcode {
                 a.wrapping_add(diff)
             };
 
-            let new_hf = (!nf && lo > 9) || (nf && hf && lo < 6);
-            let new_cf = hi6;
-
             env.state.reg.set_a(new_a);
-            env.state.reg.update_daa_flags(new_a, new_hf, new_cf);
+            env.state.reg.update_sz53_flags(new_a);
+            env.state.reg.update_p_flag(new_a);
+            let new_hf = (!nf && lo > 9) || (nf && hf && lo < 6);
+            env.state.reg.put_flag(Flag::H, new_hf);
+            env.state.reg.put_flag(Flag::C, hi6);
+    
+
             // N unchanged
         })
     }
@@ -143,14 +146,11 @@ pub fn build_daa8080() -> Opcode {
             let hi6 = cf || (hi > 9) || (hi == 9 && lo > 9);
             let diff = if lo6 {6} else {0}
                 + if hi6 {6<<4} else {0};
-            //let new_a = a.wrapping_add(diff);
 
             let new_a = operator_add(env, a, diff);
             env.state.reg.set_a(new_a);
             env.state.reg.put_flag(Flag::C, cf || hi6);
 
-            // env.state.reg.update_daa_flags(new_a, new_hf, new_cf);
-            // N unchanged
         })
     }
 }

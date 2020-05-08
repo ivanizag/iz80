@@ -73,10 +73,7 @@ pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast
             env.set_reg(r, v);
 
             env.state.reg.put_flag(Flag::C, carry);
-            if !env.state.reg.mode8080 {
-                env.state.reg.clear_flag(Flag::H);
-                env.state.reg.clear_flag(Flag::N);
-            }
+            env.state.reg.update_hn_flags(false, false);
             if fast {
                 env.state.reg.update_undocumented_flags(v);
             } else {
@@ -95,13 +92,11 @@ pub fn build_bit_r(n: u8, r: Reg8) -> Opcode {
             let v = env.reg8_ext(r);
             let z = v & (1<<n);
             env.state.reg.put_flag(Flag::S, (z & 0x80) != 0);
-            env.state.reg.update_undocumented_flags(v); // TUZD-4.1, copy bits from reg
             env.state.reg.put_flag(Flag::Z, z == 0);
             env.state.reg.put_flag(Flag::P, z == 0);
-            if !env.state.reg.mode8080 {
-                env.state.reg.set_flag(Flag::H);
-                env.state.reg.clear_flag(Flag::N);
-            }
+            env.state.reg.set_flag(Flag::H);
+            env.state.reg.clear_flag(Flag::N); // BIT is Z80 only
+
 
             if r == Reg8::_HL {
                 // Exceptions for (IX+d) TUZD-4-1
@@ -120,6 +115,8 @@ pub fn build_bit_r(n: u8, r: Reg8) -> Opcode {
                 are the same. YF and XF are copied from some sort
                 of internal register */
                 // Not implemented. Just done the same than for (IX+d)
+            } else {
+                env.state.reg.update_undocumented_flags(v); // TUZD-4.1, copy bits from reg
             }
         })
     }
@@ -181,10 +178,7 @@ pub fn build_cpl() -> Opcode {
             v = !v;
             env.state.reg.set_a(v);
 
-            if !env.state.reg.mode8080 {
-                env.state.reg.set_flag(Flag::H);
-                env.state.reg.set_flag(Flag::N);
-            }
+            env.state.reg.update_hn_flags(true, true);
             env.state.reg.update_undocumented_flags(v);
         })
     }
@@ -197,10 +191,7 @@ pub fn build_scf() -> Opcode {
             let a = env.state.reg.a();
 
             env.state.reg.set_flag(Flag::C);
-            if !env.state.reg.mode8080 {
-                env.state.reg.clear_flag(Flag::H);
-                env.state.reg.clear_flag(Flag::N);
-            }
+            env.state.reg.update_hn_flags(false, false);
             env.state.reg.update_undocumented_flags(a);
         })
     }
@@ -214,10 +205,7 @@ pub fn build_ccf() -> Opcode {
             let c = env.state.reg.get_flag(Flag::C);
 
             env.state.reg.put_flag(Flag::C, !c);
-            if !env.state.reg.mode8080 {
-                env.state.reg.put_flag(Flag::H, c);
-                env.state.reg.clear_flag(Flag::N);
-            }
+            env.state.reg.update_hn_flags(c, false);
             env.state.reg.update_undocumented_flags(a);
         })
     }

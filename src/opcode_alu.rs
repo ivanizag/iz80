@@ -60,17 +60,12 @@ pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
             if env.state.reg.get_flag(Flag::H) {
                 n = n.wrapping_sub(1);
             }
-            // S, Z and H set by operator_cp()
-            if !env.state.reg.mode8080 {
-                env.state.reg.put_flag(Flag::_5, n & (1<<1) != 0);
-                env.state.reg.put_flag(Flag::_3, n & (1<<3) != 0);
-                env.state.reg.set_flag(Flag::N);
-            }
-
+            env.state.reg.update_undocumented_flags_block(n);
+            env.state.reg.set_flag(Flag::N);
             env.state.reg.put_flag(Flag::P, bc != 0);
             env.state.reg.put_flag(Flag::C, c_bak); // C unchanged
+            // S, Z and H set by operator_cp()
 
-            //let hl_ = env.reg8_ext(Reg8::_HL);
             if repeat && bc != 0 &&  a != b {
                 // Back to redo the instruction
                 let pc = env.state.reg.pc().wrapping_sub(2);

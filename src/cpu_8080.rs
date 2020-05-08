@@ -6,7 +6,7 @@ use super::state::*;
 
 /// The 8080 cpu emulator.
 /// 
-/// Executes 8080 instructions changing the cpu State and Machine
+/// Executes Intel 8080 instructions changing the cpu State and Machine
 pub struct Cpu8080 {
     decoder: Decoder8080,
     state: State,

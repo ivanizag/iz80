@@ -100,7 +100,7 @@ pub struct Registers {
     iff1: bool,
     iff2: bool,
     im: u8,
-    pub mode8080: bool // TODO: remove pub
+    mode8080: bool
 }
 
 impl Registers {
@@ -182,6 +182,11 @@ impl Registers {
     pub fn set16(&mut self, rr: Reg16, value: u16) {
         self.data[rr as usize +1] = value as u8;
         self.data[rr as usize] = (value >> 8) as u8;
+        //if self.mode8080 && rr == Reg16::AF {
+        if self.mode8080 && rr == Reg16::AF {
+            // Ensure non existent flags have proper values
+            self.set_flag(Flag::N);
+        }
     }
 
     pub(crate) fn inc_dec16(&mut self, rr: Reg16, inc: bool) -> u16 {
@@ -208,21 +213,25 @@ impl Registers {
     }
 
     /// Returns the value of a flag
+    #[inline]
     pub fn get_flag(&self, flag: Flag) -> bool {
         self.get8(Reg8::F) & flag as u8 != 0
     }
 
     /// Sets a flag. Sets the value to true
+    #[inline]
     pub fn set_flag(&mut self, flag: Flag) {
         self.data[Reg8::F as usize] |= flag as u8;
     }
 
     /// Clears a flag. Sets the value to false
+    #[inline]
     pub fn clear_flag(&mut self, flag: Flag) {
         self.data[Reg8::F as usize] &= !(flag as u8);
     }
 
     /// Sets the value of a flag
+    #[inline]
     pub fn put_flag(&mut self, flag: Flag, value: bool) {
         if value {
             self.set_flag(flag);
@@ -231,88 +240,85 @@ impl Registers {
         }
     }
 
-
-
-    // Only for add18
-    pub(crate) fn update_ch_flags(&mut self, xored: u16) {
-        let carry_bit = (xored >> 8 & 1) != 0;
-        self.put_flag(Flag::C, carry_bit);
-
-        let half_bit  = (xored >> 4 & 1) != 0;
-        self.put_flag(Flag::H, half_bit);
+    pub(crate) fn update_hn_flags(&mut self, hf: bool, nf: bool) {
+        if !self.mode8080 {
+            self.put_flag(Flag::H, hf);
+            self.put_flag(Flag::N, nf);
+        }
     }
 
-    fn update_p_flag(&mut self, reference: u8) {
+
+    pub(crate) fn update_p_flag(&mut self, reference: u8) {
         let bits = reference.count_ones();
         self.put_flag(Flag::P, bits % 2 == 0);
     }
 
-    pub(crate) fn update_undocumented_flags(&mut self, reference: u8) {
-
-        if self.mode8080 {
-            self.clear_flag(Flag::_3);
-            self.clear_flag(Flag::_5);
-            self.set_flag(Flag::N);
-        } else {
-            let f: &mut u8 = &mut self.data[Reg8::F as usize];
-
-            // Bits 5, and 3 are copied
-            const MASK_53: u8 = Flag::_5 as u8 + Flag::_3 as u8;
-            *f = (*f & !MASK_53) + (reference & MASK_53);
-        }
-    }
-
-    fn update_sz53_flags(&mut self, reference: u8) {
+    pub(crate) fn update_sz53_flags(&mut self, reference: u8) {
         self.update_undocumented_flags(reference);
-
-        let f: &mut u8 = &mut self.data[Reg8::F as usize];
-        // Zero
-        if reference == 0 {
-            *f |= Flag::Z as u8
-        } else {
-            *f &= !(Flag::Z as u8)
-        }
-
-        // Sign is copied
-        const MASK_S: u8 = Flag::S as u8;
-        *f = (*f & !MASK_S) + (reference & MASK_S);
+        self.put_flag(Flag::Z, reference == 0);
+        self.put_flag(Flag::S, reference & (1<<7) != 0);
     }
 
-    pub(crate) fn update_arithmetic_flags_16_alt(&mut self, a: u32, b: u32, reference: u32, neg: bool) {
+    pub(crate) fn update_undocumented_flags(&mut self, reference: u8) {
+        if !self.mode8080 {
+            // Bits 5, and 3 are copied
+            self.put_flag(Flag::_5, reference & (1<<5) != 0);
+            self.put_flag(Flag::_3, reference & (1<<3) != 0);
+        }
+    }
+    
+    pub(crate) fn update_undocumented_flags_block(&mut self, reference: u8) {
+        if !self.mode8080 {
+            // TUZD-4.2
+            self.put_flag(Flag::_5, reference & (1<<1) != 0);
+            self.put_flag(Flag::_3, reference & (1<<3) != 0);
+        }
+    }
+
+    pub(crate) fn update_add16_flags(&mut self, a: u32, b: u32, v: u32) {
         if self.mode8080 {
-            // No ADC or SBC on the 8080
+            self.put_flag(Flag::C, (v & 0x10000) != 0);
         } else {
-            self.update_arithmetic_flags_alt((a >> 8) as u16, (b >> 8) as u16, (reference >> 8) as u16, neg, true);
-
+            // TUZD-8.6
+            // Flags are affected by the high order byte.
+            // S, Z and P/V are not updated
+            let xor = ((a ^ b ^ v) >> 8) as u16;
+            self.update_undocumented_flags((v >> 8) as u8);
+            self.put_flag(Flag::C, (xor >> 8 & 1) != 0);
+            self.put_flag(Flag::H, (xor >> 4 & 1) != 0);
+            self.clear_flag(Flag::N);
         }
     }
 
+    pub(crate) fn update_arithmetic_flags_16(&mut self, a: u32, b: u32, reference: u32, neg: bool) {
+        // No ADC or SBC on the 8080
+        self.update_arithmetic_flags((a >> 8) as u16, (b >> 8) as u16, (reference >> 8) as u16, neg, true);
+    }
 
-    pub(crate) fn update_arithmetic_flags_alt(&mut self, a: u16, b: u16, reference: u16, neg: bool, update_carry: bool) {
+    pub(crate) fn update_arithmetic_flags(&mut self, a: u16, b: u16, reference: u16, neg: bool, update_carry: bool) {
         self.update_sz53_flags(reference as u8);
 
         // TUZD-8.6
         let xor = a ^ b ^ reference;
-        let carry_bit = (xor >> 8 & 1) != 0;
+        let carry_bit = (xor & 0x100) != 0;
         if update_carry {
             self.put_flag(Flag::C, carry_bit);
         }
 
-
-        let half_bit  = (xor >> 4 & 1) != 0;
+        let half_bit  = (xor & 0x10) != 0;
         self.put_flag(Flag::H, half_bit);
-        if self.mode8080 && neg {
-            let a_b3 = (a & 0x08) != 0;
-            let b_b3 = (b & 0x08) != 0;
-            let r_b3 = (reference & 0x08) != 0;
-            let neg_half_bit = (!a_b3 && !b_b3 && !r_b3) || (a_b3 && !(b_b3 && r_b3)); 
-            self.put_flag(Flag::H, neg_half_bit);
-        }
 
         if self.mode8080 {
             self.update_p_flag(reference as u8);
+            if neg {
+                let a_b3 = (a & 0x08) != 0;
+                let b_b3 = (b & 0x08) != 0;
+                let r_b3 = (reference & 0x08) != 0;
+                let neg_half_bit = (!a_b3 && !b_b3 && !r_b3) || (a_b3 && !(b_b3 && r_b3)); 
+                self.put_flag(Flag::H, neg_half_bit);    
+            }
         } else {
-            let top_xor = (xor >> 7 & 1) != 0;
+            let top_xor = (xor & 0x80) != 0;
             self.put_flag(Flag::P, carry_bit != top_xor); // As overflow flag
             self.put_flag(Flag::N, neg);
         }
@@ -320,15 +326,11 @@ impl Registers {
 
     pub(crate) fn update_logic_flags(&mut self, a: u8, b: u8, reference: u8, is_and: bool) {
         self.update_sz53_flags(reference);
-
         self.update_p_flag(reference);
         self.clear_flag(Flag::C);
+
         if self.mode8080 {
-            if is_and {
-                self.put_flag(Flag::H, ((a | b) & 0x08) != 0);
-            } else {
-                self.clear_flag(Flag::H);
-            }
+            self.put_flag(Flag::H, is_and && (((a | b) & 0x08) != 0));
         } else {
             self.clear_flag(Flag::N);
             self.put_flag(Flag::H, is_and);
@@ -341,8 +343,8 @@ impl Registers {
 
         self.put_flag(Flag::H, k>255);
         if !self.mode8080 {
-            self.update_p_flag(k as u8 & 7 ^ counter);
-            self.put_flag(Flag::N, reference >> 7 == 1);
+            self.update_p_flag(k as u8 & 0x07 ^ counter);
+            self.put_flag(Flag::N, reference & 0x80 != 0);
         }
         self.put_flag(Flag::C, k>255);
     }
@@ -354,16 +356,6 @@ impl Registers {
             self.update_p_flag(reference);
             self.clear_flag(Flag::N);
         }
-    }
-
-    pub(crate) fn update_daa_flags(&mut self, reference: u8, hf: bool, cf:bool) {
-        self.update_sz53_flags(reference);
-        if !self.mode8080 {
-            self.update_p_flag(reference);
-        }
-        self.put_flag(Flag::H, hf);
-        self.put_flag(Flag::C, cf);
-
     }
 
     /// Returns the program counter

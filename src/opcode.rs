@@ -83,10 +83,6 @@ pub fn build_pop_rr(rr: Reg16) -> Opcode {
         action: Box::new(move |env: &mut Environment| {
             let value = env.pop();
             env.set_reg16(rr, value);
-            if env.state.reg.mode8080 && rr == Reg16::AF {
-                // Ensure non existent flags have proper values
-                env.state.reg.set_flag(Flag::N);
-            }
         })
     }
 }
