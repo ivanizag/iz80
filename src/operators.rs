@@ -30,13 +30,17 @@ pub fn operator_add16(env: &mut Environment, aa: u16, bb: u16) -> u16 {
 
     let vv = vvvv as u16;
 
-    // TUZD-8.6
-    // Flags are affected by the high order byte.
-    // S, Z and P/V are not updated
-    env.state.reg.update_undocumented_flags((vv >> 8) as u8);
-    env.state.reg.update_ch_flags(((aaaa ^ bbbb ^ vvvv) >> 8) as u16);
-    if !env.state.reg.mode8080 {
-        env.state.reg.clear_flag(Flag::N);
+    if env.state.reg.mode8080 {
+        env.state.reg.put_flag(Flag::C, (vvvv & 0x10000) != 0);
+    } else {
+        // TUZD-8.6
+        // Flags are affected by the high order byte.
+        // S, Z and P/V are not updated
+        env.state.reg.update_undocumented_flags((vv >> 8) as u8);
+        env.state.reg.update_ch_flags(((aaaa ^ bbbb ^ vvvv) >> 8) as u16);
+        if !env.state.reg.mode8080 {
+            env.state.reg.clear_flag(Flag::N);
+        }
     }
     vv
 }
@@ -52,7 +56,7 @@ pub fn operator_adc16(env: &mut Environment, aa: u16, bb: u16) -> u16 {
 
     // TUZD-8.6
     //env.state.reg.update_arithmetic_flags((vv >> 8) as u8, ((aaaa ^ bbbb ^ vvvv) >> 8) as u16, false);
-    env.state.reg.update_arithmetic_flags_alt((aaaa >> 8) as u16, (bbbb >> 8) as u16, (vvvv >> 8) as u16, false, true);
+    env.state.reg.update_arithmetic_flags_16_alt(aaaa, bbbb, vvvv, false);
 
     env.state.reg.put_flag(Flag::Z, vv == 0);
 
@@ -70,7 +74,7 @@ pub fn operator_sbc16(env: &mut Environment, aa: u16, bb: u16) -> u16 {
 
     // TUZD-8.6
     //env.state.reg.update_arithmetic_flags((vv >> 8) as u8, ((aaaa ^ bbbb ^ vvvv) >> 8) as u16, true);
-    env.state.reg.update_arithmetic_flags_alt((aaaa >> 8) as u16, (bbbb >> 8) as u16, (vvvv >> 8) as u16, true, true);
+    env.state.reg.update_arithmetic_flags_16_alt(aaaa, bbbb, vvvv, true);
     env.state.reg.put_flag(Flag::Z, vv == 0);
 
     vv

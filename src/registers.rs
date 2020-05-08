@@ -123,9 +123,9 @@ impl Registers {
 
     pub(crate) fn set_8080(&mut self) {
         self.mode8080 = true;
-        self.set_flag(Flag::N);
         self.set16(Reg16::AF, 0xffff);
         self.set16(Reg16::SP, 0xffff);
+        self.set_flag(Flag::N);
     }
 
     /// Returns the value of the A register
@@ -278,20 +278,28 @@ impl Registers {
         *f = (*f & !MASK_S) + (reference & MASK_S);
     }
 
+    pub(crate) fn update_arithmetic_flags_16_alt(&mut self, a: u32, b: u32, reference: u32, neg: bool) {
+        if self.mode8080 {
+            // No ADC or SBC on the 8080
+        } else {
+            self.update_arithmetic_flags_alt((a >> 8) as u16, (b >> 8) as u16, (reference >> 8) as u16, neg, true);
 
-    //sz5h3vnc
+        }
+    }
+
+
     pub(crate) fn update_arithmetic_flags_alt(&mut self, a: u16, b: u16, reference: u16, neg: bool, update_carry: bool) {
         self.update_sz53_flags(reference as u8);
 
         // TUZD-8.6
-        let xored = a ^ b ^ reference;
-        let carry_bit = (xored >> 8 & 1) != 0;
+        let xor = a ^ b ^ reference;
+        let carry_bit = (xor >> 8 & 1) != 0;
         if update_carry {
             self.put_flag(Flag::C, carry_bit);
         }
 
 
-        let half_bit  = (xored >> 4 & 1) != 0;
+        let half_bit  = (xor >> 4 & 1) != 0;
         self.put_flag(Flag::H, half_bit);
         if self.mode8080 && neg {
             let a_b3 = (a & 0x08) != 0;
@@ -304,7 +312,7 @@ impl Registers {
         if self.mode8080 {
             self.update_p_flag(reference as u8);
         } else {
-            let top_xor = (xored >> 7 & 1) != 0;
+            let top_xor = (xor >> 7 & 1) != 0;
             self.put_flag(Flag::P, carry_bit != top_xor); // As overflow flag
             self.put_flag(Flag::N, neg);
         }

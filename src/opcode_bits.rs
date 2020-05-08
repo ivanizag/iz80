@@ -181,8 +181,8 @@ pub fn build_cpl() -> Opcode {
             v = !v;
             env.state.reg.set_a(v);
 
-            env.state.reg.set_flag(Flag::H);
             if !env.state.reg.mode8080 {
+                env.state.reg.set_flag(Flag::H);
                 env.state.reg.set_flag(Flag::N);
             }
             env.state.reg.update_undocumented_flags(v);
@@ -197,8 +197,8 @@ pub fn build_scf() -> Opcode {
             let a = env.state.reg.a();
 
             env.state.reg.set_flag(Flag::C);
-            env.state.reg.clear_flag(Flag::H);
             if !env.state.reg.mode8080 {
+                env.state.reg.clear_flag(Flag::H);
                 env.state.reg.clear_flag(Flag::N);
             }
             env.state.reg.update_undocumented_flags(a);
@@ -214,8 +214,8 @@ pub fn build_ccf() -> Opcode {
             let c = env.state.reg.get_flag(Flag::C);
 
             env.state.reg.put_flag(Flag::C, !c);
-            env.state.reg.put_flag(Flag::H, c);
             if !env.state.reg.mode8080 {
+                env.state.reg.put_flag(Flag::H, c);
                 env.state.reg.clear_flag(Flag::N);
             }
             env.state.reg.update_undocumented_flags(a);
