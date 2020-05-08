@@ -73,8 +73,10 @@ pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast
             env.set_reg(r, v);
 
             env.state.reg.put_flag(Flag::C, carry);
-            env.state.reg.clear_flag(Flag::H);
-            env.state.reg.clear_flag(Flag::N);
+            if !env.state.reg.mode8080 {
+                env.state.reg.clear_flag(Flag::H);
+                env.state.reg.clear_flag(Flag::N);
+            }
             if fast {
                 env.state.reg.update_undocumented_flags(v);
             } else {
@@ -95,9 +97,11 @@ pub fn build_bit_r(n: u8, r: Reg8) -> Opcode {
             env.state.reg.put_flag(Flag::S, (z & 0x80) != 0);
             env.state.reg.update_undocumented_flags(v); // TUZD-4.1, copy bits from reg
             env.state.reg.put_flag(Flag::Z, z == 0);
-            env.state.reg.set_flag(Flag::H);
             env.state.reg.put_flag(Flag::P, z == 0);
-            env.state.reg.clear_flag(Flag::N);
+            if !env.state.reg.mode8080 {
+                env.state.reg.set_flag(Flag::H);
+                env.state.reg.clear_flag(Flag::N);
+            }
 
             if r == Reg8::_HL {
                 // Exceptions for (IX+d) TUZD-4-1
@@ -178,7 +182,9 @@ pub fn build_cpl() -> Opcode {
             env.state.reg.set_a(v);
 
             env.state.reg.set_flag(Flag::H);
-            env.state.reg.set_flag(Flag::N);
+            if !env.state.reg.mode8080 {
+                env.state.reg.set_flag(Flag::N);
+            }
             env.state.reg.update_undocumented_flags(v);
         })
     }
@@ -192,7 +198,9 @@ pub fn build_scf() -> Opcode {
 
             env.state.reg.set_flag(Flag::C);
             env.state.reg.clear_flag(Flag::H);
-            env.state.reg.clear_flag(Flag::N);
+            if !env.state.reg.mode8080 {
+                env.state.reg.clear_flag(Flag::N);
+            }
             env.state.reg.update_undocumented_flags(a);
         })
     }
@@ -207,7 +215,9 @@ pub fn build_ccf() -> Opcode {
 
             env.state.reg.put_flag(Flag::C, !c);
             env.state.reg.put_flag(Flag::H, c);
-            env.state.reg.clear_flag(Flag::N);
+            if !env.state.reg.mode8080 {
+                env.state.reg.clear_flag(Flag::N);
+            }
             env.state.reg.update_undocumented_flags(a);
         })
     }

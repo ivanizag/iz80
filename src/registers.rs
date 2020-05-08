@@ -71,6 +71,7 @@ pub enum Flag {
     P  = 4, // P/V
     /// Undocumented third flag
     _3 = 8,
+
     /// Half carry flag
     H  = 16,
     /// Undocumented fifth flag
@@ -98,7 +99,8 @@ pub struct Registers {
     pc: u16,
     iff1: bool,
     iff2: bool,
-    im: u8
+    im: u8,
+    pub mode8080: bool // TODO: remove pub
 }
 
 impl Registers {
@@ -110,13 +112,20 @@ impl Registers {
             pc: 0,
             iff1: false,
             iff2: false,
-            im: 0
+            im: 0,
+            mode8080: false
         };
 
         reg.set16(Reg16::AF, 0xffff);
         reg.set16(Reg16::SP, 0xffff);
-
         reg
+    }
+
+    pub(crate) fn set_8080(&mut self) {
+        self.mode8080 = true;
+        self.set_flag(Flag::N);
+        self.set16(Reg16::AF, 0xffff);
+        self.set16(Reg16::SP, 0xffff);
     }
 
     /// Returns the value of the A register
@@ -239,11 +248,18 @@ impl Registers {
     }
 
     pub(crate) fn update_undocumented_flags(&mut self, reference: u8) {
-        let f: &mut u8 = &mut self.data[Reg8::F as usize];
 
-        // Bits 5, and 3 are copied
-        const MASK_53: u8 = Flag::_5 as u8 + Flag::_3 as u8;
-        *f = (*f & !MASK_53) + (reference & MASK_53);
+        if self.mode8080 {
+            self.clear_flag(Flag::_3);
+            self.clear_flag(Flag::_5);
+            self.set_flag(Flag::N);
+        } else {
+            let f: &mut u8 = &mut self.data[Reg8::F as usize];
+
+            // Bits 5, and 3 are copied
+            const MASK_53: u8 = Flag::_5 as u8 + Flag::_3 as u8;
+            *f = (*f & !MASK_53) + (reference & MASK_53);
+        }
     }
 
     fn update_sz53_flags(&mut self, reference: u8) {
@@ -262,38 +278,53 @@ impl Registers {
         *f = (*f & !MASK_S) + (reference & MASK_S);
     }
 
-// sz5h3[pv]nc
 
     //sz5h3vnc
-    pub(crate) fn update_arithmetic_flags(&mut self, reference: u8, xored: u16, neg: bool) {
+    pub(crate) fn update_arithmetic_flags_alt(&mut self, a: u16, b: u16, reference: u16, neg: bool, update_carry: bool) {
+        self.update_sz53_flags(reference as u8);
+
         // TUZD-8.6
+        let xored = a ^ b ^ reference;
         let carry_bit = (xored >> 8 & 1) != 0;
-        self.put_flag(Flag::C, carry_bit);
+        if update_carry {
+            self.put_flag(Flag::C, carry_bit);
+        }
 
-        self.update_inc_dec_flags(reference, xored, neg);
-    }
-
-    // sz5h3vn
-    pub(crate) fn update_inc_dec_flags(&mut self, reference: u8, xored: u16, neg: bool) {
-        self.update_sz53_flags(reference);
 
         let half_bit  = (xored >> 4 & 1) != 0;
         self.put_flag(Flag::H, half_bit);
+        if self.mode8080 && neg {
+            let a_b3 = (a & 0x08) != 0;
+            let b_b3 = (b & 0x08) != 0;
+            let r_b3 = (reference & 0x08) != 0;
+            let neg_half_bit = (!a_b3 && !b_b3 && !r_b3) || (a_b3 && !(b_b3 && r_b3)); 
+            self.put_flag(Flag::H, neg_half_bit);
+        }
 
-        let carry_bit = (xored >> 8 & 1) != 0;
-        let top_xor   = (xored >> 7 & 1) != 0;
-        self.put_flag(Flag::P, carry_bit != top_xor); // As overflow flag
-
-        self.put_flag(Flag::N, neg);
+        if self.mode8080 {
+            self.update_p_flag(reference as u8);
+        } else {
+            let top_xor = (xored >> 7 & 1) != 0;
+            self.put_flag(Flag::P, carry_bit != top_xor); // As overflow flag
+            self.put_flag(Flag::N, neg);
+        }
     }
 
-    pub(crate) fn update_logic_flags(&mut self, reference: u8, is_and: bool) {
+    pub(crate) fn update_logic_flags(&mut self, a: u8, b: u8, reference: u8, is_and: bool) {
         self.update_sz53_flags(reference);
 
         self.update_p_flag(reference);
         self.clear_flag(Flag::C);
-        self.clear_flag(Flag::N);
-        self.put_flag(Flag::H, is_and);
+        if self.mode8080 {
+            if is_and {
+                self.put_flag(Flag::H, ((a | b) & 0x08) != 0);
+            } else {
+                self.clear_flag(Flag::H);
+            }
+        } else {
+            self.clear_flag(Flag::N);
+            self.put_flag(Flag::H, is_and);
+        }
     }
 
     pub(crate) fn update_block_flags(&mut self, reference: u8, k: u16, counter: u8) {
@@ -301,21 +332,27 @@ impl Registers {
         self.update_sz53_flags(counter);
 
         self.put_flag(Flag::H, k>255);
-        self.update_p_flag(k as u8 & 7 ^ counter);
-        self.put_flag(Flag::N, reference >> 7 == 1);
+        if !self.mode8080 {
+            self.update_p_flag(k as u8 & 7 ^ counter);
+            self.put_flag(Flag::N, reference >> 7 == 1);
+        }
         self.put_flag(Flag::C, k>255);
     }
 
     pub(crate) fn update_bits_in_flags(&mut self, reference: u8) {
         self.update_sz53_flags(reference);
-        self.update_p_flag(reference);
         self.clear_flag(Flag::H);
-        self.clear_flag(Flag::N);
+        if !self.mode8080 {
+            self.update_p_flag(reference);
+            self.clear_flag(Flag::N);
+        }
     }
 
     pub(crate) fn update_daa_flags(&mut self, reference: u8, hf: bool, cf:bool) {
         self.update_sz53_flags(reference);
-        self.update_p_flag(reference);
+        if !self.mode8080 {
+            self.update_p_flag(reference);
+        }
         self.put_flag(Flag::H, hf);
         self.put_flag(Flag::C, cf);
 

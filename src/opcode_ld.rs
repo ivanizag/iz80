@@ -251,13 +251,14 @@ pub fn build_ld_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
             let bc = env.state.reg.inc_dec16(Reg16::BC, false /*decrement*/);
 
             // TUZD-4.2
-            //println!("LDIR {:02x} {:02x} {:02b}", value, env.state.reg.a(), value.wrapping_add(env.state.reg.a()));
-            let n = value.wrapping_add(env.state.reg.a());
-            env.state.reg.put_flag(Flag::_5, n & (1<<1) != 0);
+            if !env.state.reg.mode8080 {
+                let n = value.wrapping_add(env.state.reg.a());
+                env.state.reg.put_flag(Flag::_5, n & (1<<1) != 0);
+                env.state.reg.put_flag(Flag::_3, n & (1<<3) != 0);
+                env.state.reg.clear_flag(Flag::N);
+            }
             env.state.reg.clear_flag(Flag::H);
-            env.state.reg.put_flag(Flag::_3, n & (1<<3) != 0);
             env.state.reg.put_flag(Flag::P, bc != 0);
-            env.state.reg.clear_flag(Flag::N);
             // S, Z and C unchanged. What about N?
 
             if repeat && bc != 0 {

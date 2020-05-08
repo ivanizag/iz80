@@ -8,7 +8,7 @@ use iz80::*;
 
 static CODE: &'static [u8] = include_bytes!("res/8080EX1.COM");
 
-//#[test]
+#[test]
 #[ignore]
 fn test_ex8080() {
     let mut machine = ZexMachine::new();
@@ -25,10 +25,10 @@ fn test_ex8080() {
     System call 5
 
     .org $5
-        out ($0), a
         ret
     */
-    let code = [0xD3, 0x00, 0xC9];
+    //let code = [0xD3, 0x00, 0xC9];
+    let code = [0xC9];
     for i in 0..code.len() {
         machine.poke(5 + i as u16, code[i]);
     }
@@ -51,7 +51,7 @@ fn test_ex8080() {
     loop {
         cpu.execute_instruction(&mut machine);
 
-        if trace {
+        if trace && false {
             // Test state
             let addr = 0x1d80 as u16;
             print!("Zex state 0x{:04x}: ", addr);
@@ -66,7 +66,7 @@ fn test_ex8080() {
             break;
         }
 
-        if machine.bdos_called {
+        if cpu.registers().pc() == 0x0005 {
             match cpu.registers().get8(Reg8::C) {
                 2 => {
                     // C_WRITE

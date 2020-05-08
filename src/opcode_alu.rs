@@ -61,12 +61,13 @@ pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
                 n = n.wrapping_sub(1);
             }
             // S, Z and H set by operator_cp()
-            env.state.reg.put_flag(Flag::_5, n & (1<<1) != 0);
-            env.state.reg.put_flag(Flag::_3, n & (1<<3) != 0);
-
+            if !env.state.reg.mode8080 {
+                env.state.reg.put_flag(Flag::_5, n & (1<<1) != 0);
+                env.state.reg.put_flag(Flag::_3, n & (1<<3) != 0);
+                env.state.reg.set_flag(Flag::N);
+            }
 
             env.state.reg.put_flag(Flag::P, bc != 0);
-            env.state.reg.set_flag(Flag::N);
             env.state.reg.put_flag(Flag::C, c_bak); // C unchanged
 
             //let hl_ = env.reg8_ext(Reg8::_HL);

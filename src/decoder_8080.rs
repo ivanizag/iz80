@@ -144,10 +144,12 @@ impl Decoder8080 {
                 _ => panic!("Unreachable")
             };
 
+            /*
             match opcode.as_ref() {
                 None => println!("0x{:02x} {:20}: {:?}", c, "Pending", p),
                 Some(o) => println!("0x{:02x} {:20}: {:?}", c, o.name, p)
             }
+            */
 
             self.no_prefix[c as usize] = opcode;
         }
