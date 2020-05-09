@@ -1,3 +1,4 @@
+use super::cpu::*;
 use super::opcode::*;
 use super::opcode_alu::*;
 use super::opcode_arith::*;
@@ -17,6 +18,19 @@ use super::environment::*;
 
 pub struct Decoder8080 {
     no_prefix: [Option<Opcode>; 256],
+}
+
+impl Decoder for Decoder8080 {
+    fn decode(&self, env: &mut Environment) -> &Opcode {
+        let b0 = env.advance_pc();
+        let opcode = &self.no_prefix[b0 as usize];
+        match opcode {
+            Some(o) => o,
+            None => {
+                panic!("Opcode {:02x} not defined", b0);
+            }
+        }
+    }
 }
 
 impl Decoder8080 {
@@ -44,17 +58,6 @@ impl Decoder8080 {
         };
         decoder.load_no_prefix();
         decoder
-    }
-
-    pub fn decode(&self, env: &mut Environment) -> &Opcode {
-        let b0 = env.advance_pc();
-        let opcode = &self.no_prefix[b0 as usize];
-        match opcode {
-            Some(o) => o,
-            None => {
-                panic!("Opcode {:02x} not defined", b0);
-            }
-        }
     }
 
     fn load_no_prefix(&mut self) {

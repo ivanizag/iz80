@@ -1,3 +1,4 @@
+use super::cpu::*;
 use super::opcode::*;
 use super::opcode_alu::*;
 use super::opcode_arith::*;
@@ -20,6 +21,33 @@ pub struct DecoderZ80 {
     prefix_cb: [Option<Opcode>; 256],
     prefix_cb_indexed: [Option<Opcode>; 256],
     prefix_ed: [Option<Opcode>; 256],
+}
+
+impl Decoder for DecoderZ80 {
+    fn decode(&self, env: &mut Environment) -> &Opcode {
+        let b0 = env.advance_pc();
+        let opcode = match b0 {
+            0xcb => {
+                if env.is_alt_index() {
+                    env.load_displacement_forced();
+                    &self.prefix_cb_indexed[env.advance_pc() as usize]
+                } else {
+                    &self.prefix_cb[env.advance_pc() as usize]
+                }
+            },
+            0xed => {
+                env.clear_index(); // With ed, the current prefix is ignored
+                &self.prefix_ed[env.advance_pc() as usize]
+            },
+            _ => &self.no_prefix[b0 as usize]
+        };
+        match opcode {
+            Some(o) => o,
+            None => {
+                panic!("Opcode {:02x} not defined", b0);
+            }
+        }
+    }
 }
 
 impl DecoderZ80 {
@@ -104,31 +132,6 @@ impl DecoderZ80 {
         decoder.load_prefix_cb_indexed();
         decoder.load_prefix_ed();
         decoder
-    }
-
-    pub fn decode(&self, env: &mut Environment) -> &Opcode {
-        let b0 = env.advance_pc();
-        let opcode = match b0 {
-            0xcb => {
-                if env.is_alt_index() {
-                    env.load_displacement_forced();
-                    &self.prefix_cb_indexed[env.advance_pc() as usize]
-                } else {
-                    &self.prefix_cb[env.advance_pc() as usize]
-                }
-            },
-            0xed => {
-                env.clear_index(); // With ed, the current prefix is ignored
-                &self.prefix_ed[env.advance_pc() as usize]
-            },
-            _ => &self.no_prefix[b0 as usize]
-        };
-        match opcode {
-            Some(o) => o,
-            None => {
-                panic!("Opcode {:02x} not defined", b0);
-            }
-        }
     }
 
     fn load_no_prefix(&mut self) {

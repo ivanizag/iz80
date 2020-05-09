@@ -1,6 +1,8 @@
 use super::decoder_z80::*;
+use super::decoder_8080::*;
 use super::environment::*;
 use super::machine::*;
+use super::opcode::*;
 use super::registers::*;
 use super::state::*;
 
@@ -8,22 +10,49 @@ use super::state::*;
 /// 
 /// Executes Z80 instructions changing the cpu State and Machine
 pub struct Cpu {
-    decoder: DecoderZ80,
     state: State,
     trace: bool,
+    decoder: Box<dyn Decoder>,
+}
+
+pub(crate) trait Decoder {
+    fn decode(&self, env: &mut Environment) -> &Opcode;
 }
 
 impl Cpu {
-    /// Returns a Cpu instance
+
+    /// Returns a Z80 Cpu instance. Alias of new_z80()
     pub fn new() -> Cpu {
         Cpu {
-            decoder: DecoderZ80::new(),
             state: State::new(),
-            trace: false
+            trace: false,
+            decoder: Box::new(DecoderZ80::new())
         }
     }
 
-    /// Executes a single Z80 instruction
+    /// Returns a Z80 Cpu instance
+    pub fn new_z80() -> Cpu {
+        Cpu {
+            state: State::new(),
+            trace: false,
+            decoder: Box::new(DecoderZ80::new())
+        }
+    }
+
+    /// Returns an Intel 8080 Cpu instance
+    pub fn new_8080() -> Cpu {
+        let mut cpu = Cpu {
+            state: State::new(),
+            trace: false,
+            decoder: Box::new(Decoder8080::new())
+        };
+
+        cpu.state.reg.set_8080();
+        cpu
+    }
+
+
+    /// Executes a single instruction
     /// 
     /// # Arguments
     /// 

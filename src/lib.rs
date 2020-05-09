@@ -13,7 +13,7 @@
 //!fn main() {
 //!    // Prepare the device
 //!    let mut machine = PlainMachine::new();
-//!    let mut cpu = Cpu::new(); // Or Cpu8080::new()
+//!    let mut cpu = Cpu::new(); // Or Cpu::new_8080()
 //!    cpu.set_trace(true);
 //!
 //!    // Load program inline or from a file with:
@@ -40,7 +40,6 @@
 
 
 mod cpu;
-mod cpu_8080;
 mod machine;
 mod registers;
 mod state;
@@ -59,7 +58,6 @@ mod opcode_ld;
 mod operators;
 
 pub use cpu::Cpu;
-pub use cpu_8080::Cpu8080;
 pub use machine::Machine;
 pub use machine::PlainMachine;
 pub use registers::*;

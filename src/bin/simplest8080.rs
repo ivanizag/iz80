@@ -3,7 +3,7 @@ use iz80::*;
 fn main() {
     // Prepare the device
     let mut machine = PlainMachine::new();
-    let mut cpu = Cpu8080::new();
+    let mut cpu = Cpu::new_8080();
     cpu.set_trace(true);
 
     // Load program inline or from a file with:
