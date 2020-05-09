@@ -186,6 +186,8 @@ impl Registers {
         if self.mode8080 && rr == Reg16::AF {
             // Ensure non existent flags have proper values
             self.set_flag(Flag::N);
+            self.clear_flag(Flag::_3);
+            self.clear_flag(Flag::_5);
         }
     }
 

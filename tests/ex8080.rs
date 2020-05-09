@@ -4,14 +4,12 @@ use iz80::*;
 8080/8085 CPU Exerciser by Ian Bartholomew and Frank Cringles
 */
 
-
-
 static CODE: &'static [u8] = include_bytes!("res/8080EX1.COM");
 
 #[test]
 #[ignore]
 fn test_ex8080() {
-    let mut machine = ZexMachine::new();
+    let mut machine = PlainMachine::new();
     let mut cpu = Cpu::new_8080();
 
     // Load program
@@ -70,7 +68,7 @@ fn test_ex8080() {
             match cpu.registers().get8(Reg8::C) {
                 2 => {
                     // C_WRITE
-                    print!("{}", cpu.registers().get8(Reg8::E));
+                    print!("{}", cpu.registers().get8(Reg8::E) as char);
                 },
                 9 => {
                     // C_WRITE_STR
@@ -92,7 +90,6 @@ fn test_ex8080() {
                 },
                 _ => panic!("BDOS command not implemented")
             }
-            machine.bdos_called = false;
         }
     }
 
@@ -102,36 +99,3 @@ fn test_ex8080() {
         assert_eq!(25, tests_passed);
     }
 }
-
-struct ZexMachine {
-    mem: [u8; 65536],
-    bdos_called: bool
-}
-
-impl ZexMachine {
-    pub fn new() -> ZexMachine {
-        ZexMachine {
-            mem: [0; 65536],
-            bdos_called: false
-        }
-    }
-}
-
-impl Machine for ZexMachine {
-    fn peek(&self, address: u16) -> u8 {
-        self.mem[address as usize]
-    }
-
-    fn poke(&mut self, address: u16, value: u8) {
-        self.mem[address as usize] = value;
-    }
-
-    fn port_in(&mut self, _address: u16) -> u8 {
-        0
-    }
-
-    fn port_out(&mut self, _address: u16, _value: u8) {
-        self.bdos_called = true;
-    }
-}
-

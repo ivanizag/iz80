@@ -6,7 +6,7 @@ static ZEXALL: &'static [u8] = include_bytes!("res/zexall.com");
 #[test]
 #[ignore]
 fn test_zexall() {
-    let mut machine = ZexMachine::new();
+    let mut machine = PlainMachine::new();
     let mut cpu = Cpu::new();
 
     // Load program
@@ -62,11 +62,11 @@ fn test_zexall() {
             break;
         }
 
-        if machine.bdos_called {
+        if cpu.registers().pc() == 0x0005 {
             match cpu.registers().get8(Reg8::C) {
                 2 => {
                     // C_WRITE
-                    print!("{}", cpu.registers().get8(Reg8::E));
+                    print!("{}", cpu.registers().get8(Reg8::E) as char);
                 },
                 9 => {
                     // C_WRITE_STR
@@ -88,7 +88,6 @@ fn test_zexall() {
                 },
                 _ => panic!("BDOS command not implemented")
             }
-            machine.bdos_called = false;
         }
     }
 
@@ -98,36 +97,3 @@ fn test_zexall() {
         assert_eq!(67, tests_passed);
     }
 }
-
-struct ZexMachine {
-    mem: [u8; 65536],
-    bdos_called: bool
-}
-
-impl ZexMachine {
-    pub fn new() -> ZexMachine {
-        ZexMachine {
-            mem: [0; 65536],
-            bdos_called: false
-        }
-    }
-}
-
-impl Machine for ZexMachine {
-    fn peek(&self, address: u16) -> u8 {
-        self.mem[address as usize]
-    }
-
-    fn poke(&mut self, address: u16, value: u8) {
-        self.mem[address as usize] = value;
-    }
-
-    fn port_in(&mut self, _address: u16) -> u8 {
-        0
-    }
-
-    fn port_out(&mut self, _address: u16, _value: u8) {
-        self.bdos_called = true;
-    }
-}
-

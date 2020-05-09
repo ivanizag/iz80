@@ -80,7 +80,7 @@ impl Cpu {
                 self.state.reg.get16(Reg16::IY),
                 self.state.reg.get8(Reg8::F)
             );
-            println!(" [{:02x} {:02x} {:02x}]", sys.peek(pc+1),
+            println!(" [{:02x} {:02x} {:02x}]", sys.peek(pc),
                 sys.peek(pc+1), sys.peek(pc+2));
         }
     }
