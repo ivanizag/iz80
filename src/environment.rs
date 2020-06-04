@@ -100,7 +100,7 @@ impl <'a> Environment<'_> {
     }
 
     pub fn load_displacement_forced(&mut self) {
-        // For DDCB and FDCB we allways have to load the
+        // For DDCB and FDCB we always have to load the
         // displacement. Even before decoding the opcode
         self.state.displacement = self.advance_pc() as i8;
         self.state.displacement_loaded = true;
@@ -109,7 +109,7 @@ impl <'a> Environment<'_> {
     pub fn load_displacement(&mut self, reg: Reg8) {
         /*
         The displacement byte is a signed 8-bit integer (-128..+127) used
-        in some instructions to specifiy a displacement added to a given
+        in some instructions to specify a displacement added to a given
         memory address. Its presence or absence depends on the instruction
         at hand, therefore, after reading the prefix and opcode, one has
         enough information to figure out whether to expect a displacement
