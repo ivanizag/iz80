@@ -9,6 +9,8 @@ pub struct State {
     pub reg: Registers,
     /// Halt state of the CPU
     pub halted: bool,
+    /// Non maskable interrupt signaled
+    pub nmi_pending: bool,
     // Alternate index management
     pub index: Reg16, // Using HL, IX or IY
     pub displacement: i8, // Used for (IX+d) and (iY+d)
@@ -22,6 +24,7 @@ impl State {
         State {
             reg: Registers::new(),
             halted: false,
+            nmi_pending: false,
             index: Reg16::HL,
             displacement: 0,
             displacement_loaded: false,

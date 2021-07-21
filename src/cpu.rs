@@ -6,6 +6,8 @@ use super::opcode::*;
 use super::registers::*;
 use super::state::*;
 
+const NMI_ADDRESS: u16 = 0x0066;
+
 /// The Z80 cpu emulator.
 /// 
 /// Executes Z80 instructions changing the cpu State and Machine
@@ -59,8 +61,21 @@ impl Cpu {
     /// * `sys` - A representation of the emulated machine that has the Machine trait
     ///  
     pub fn execute_instruction(&mut self, sys: &mut dyn Machine) {
-        let pc = self.state.reg.pc();
+        if self.is_halted() && !self.state.nmi_pending {
+            // The CPU is in HALT state. Only interrupts can execute.
+            return
+        }
+
         let mut env = Environment::new(&mut self.state, sys);
+        if env.state.nmi_pending {
+            env.state.nmi_pending = false;
+            env.state.halted = false;
+            env.state.reg.start_nmi();
+            env.subroutine_call(NMI_ADDRESS);
+        }
+
+
+        let pc = env.state.reg.pc();
         let opcode = self.decoder.decode(&mut env);
         if self.trace {
             print!("==> {:04x}: {:20}", pc, opcode.disasm(&mut env));
@@ -81,7 +96,7 @@ impl Cpu {
                 self.state.reg.get8(Reg8::F)
             );
             println!(" [{:02x} {:02x} {:02x}]", sys.peek(pc),
-                sys.peek(pc+1), sys.peek(pc+2));
+                sys.peek(pc.wrapping_add(1)), sys.peek(pc.wrapping_add(2)));
         }
     }
 
@@ -103,6 +118,11 @@ impl Cpu {
     /// Returns if the Cpu has executed a HALT
     pub fn is_halted(&self) -> bool {
         self.state.halted
+    }
+
+    /// Non maskable interrupt request
+    pub fn signal_nmi(&mut self) {
+        self.state.nmi_pending = true
     }
 }
 

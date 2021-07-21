@@ -87,8 +87,7 @@ pub fn build_call() -> Opcode {
         name: "CALL nn".to_string(),
         action: Box::new(move |env: &mut Environment| {
             let address = env.advance_immediate16();
-            env.push(env.state.reg.pc());
-            env.state.reg.set_pc(address);
+            env.subroutine_call(address);
         })
     }
 }
@@ -99,8 +98,7 @@ pub fn build_call_eq((flag, value, name): (Flag, bool, &str)) -> Opcode {
         action: Box::new(move |env: &mut Environment| {
             let address = env.advance_immediate16();
             if env.state.reg.get_flag(flag) == value {
-                env.push(env.state.reg.pc());
-                env.state.reg.set_pc(address);
+                env.subroutine_call(address);
             }
         })
     }
@@ -111,23 +109,18 @@ pub fn build_rst(d: u8) -> Opcode {
         name: format!("RST {:02x}h", d),
         action: Box::new(move |env: &mut Environment| {
             let address = d as u16;
-            env.push(env.state.reg.pc());
-            env.state.reg.set_pc(address);
+            env.subroutine_call(address);
         })
     }
 }
 
 // Returns
-fn operation_return(env: &mut Environment) {
-    let pc = env.pop();
-    env.state.reg.set_pc(pc);
-}
 
 pub fn build_ret() -> Opcode {
     Opcode {
         name: "RET".to_string(),
         action: Box::new(move |env: &mut Environment| {
-            operation_return(env);
+            env.subroutine_return();
         })
     }
 }
@@ -136,7 +129,7 @@ pub fn build_reti() -> Opcode {
     Opcode {
         name: "RETI".to_string(),
         action: Box::new(move |env: &mut Environment| {
-            operation_return(env);
+            env.subroutine_return();
         })
     }
 }
@@ -145,9 +138,8 @@ pub fn build_retn() -> Opcode {
     Opcode {
         name: "RETN".to_string(),
         action: Box::new(move |env: &mut Environment| {
-            operation_return(env);
-
-            // TODO: "The contents of IIF2 is copied back into IIF1"
+            env.subroutine_return();
+            env.state.reg.end_nmi();
         })
     }
 }
@@ -157,7 +149,7 @@ pub fn build_ret_eq((flag, value, name): (Flag, bool, &str)) -> Opcode {
         name: format!("RET {}", name),
         action: Box::new(move |env: &mut Environment| {
             if env.state.reg.get_flag(flag) == value {
-                operation_return(env);
+                env.subroutine_return();
             }
         })
     }

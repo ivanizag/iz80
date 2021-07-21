@@ -66,6 +66,16 @@ impl <'a> Environment<'_> {
         (l as u16) + ((h as u16) << 8)
     }
 
+    pub fn subroutine_call(&mut self, address: u16) {
+        self.push(self.state.reg.pc());
+        self.state.reg.set_pc(address);
+    }
+
+    pub fn subroutine_return(&mut self) {
+        let pc = self.pop();
+        self.state.reg.set_pc(pc);
+    }
+
     pub fn set_index(&mut self, index: Reg16) {
         self.state.index = index;
         self.state.index_changed = true;

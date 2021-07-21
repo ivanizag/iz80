@@ -373,12 +373,23 @@ impl Registers {
     }
 
     pub(crate) fn set_interrupts(&mut self, v: bool) {
+        self.iff1 = v;
         self.iff2 = v;
     }
 
     pub(crate) fn set_interrupt_mode(&mut self, im: u8) {
         self.im = im;
     }
+
+    pub(crate) fn start_nmi(&mut self) {
+        self.iff2 = self.iff1;
+        self.iff1 = false;
+    }
+
+    pub(crate) fn end_nmi(&mut self) {
+        self.iff1 = self.iff2;
+    }
+
 }
 
 #[cfg(test)]
