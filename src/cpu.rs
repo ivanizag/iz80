@@ -61,7 +61,7 @@ impl Cpu {
     /// * `sys` - A representation of the emulated machine that has the Machine trait
     ///  
     pub fn execute_instruction(&mut self, sys: &mut dyn Machine) {
-        if self.is_halted() && !self.state.nmi_pending {
+        if self.is_halted() {
             // The CPU is in HALT state. Only interrupts can execute.
             return
         }
@@ -117,7 +117,7 @@ impl Cpu {
 
     /// Returns if the Cpu has executed a HALT
     pub fn is_halted(&self) -> bool {
-        self.state.halted
+        self.state.halted  && !self.state.nmi_pending
     }
 
     /// Non maskable interrupt request
