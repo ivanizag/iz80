@@ -74,14 +74,13 @@ impl Cpu {
             env.subroutine_call(NMI_ADDRESS);
         }
 
-
         let pc = env.state.reg.pc();
         let opcode = self.decoder.decode(&mut env);
         if self.trace {
             print!("==> {:04x}: {:20}", pc, opcode.disasm(&mut env));
         }
         opcode.execute(&mut env);
-        env.step();
+        env.clear_index();
 
         if self.trace {
             print!(" PC:{:04x} AF:{:04x} BC:{:04x} DE:{:04x} HL:{:04x} SP:{:04x} IX:{:04x} IY:{:04x} Flags:{:08b}",

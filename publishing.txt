@@ -1,4 +1,4 @@
 Reminder:
 - Change the version in Cargo.toml, rebuild and commit
 - Create a tag (git tag v0.3.4) and push (git push --tags)
-- Publish (cargo Publish)
+- Publish (cargo publish)

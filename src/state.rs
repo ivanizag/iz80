@@ -15,7 +15,6 @@ pub struct State {
     pub index: Reg16, // Using HL, IX or IY
     pub displacement: i8, // Used for (IX+d) and (iY+d)
     pub displacement_loaded: bool, // TODO: remove
-    pub index_changed: bool, // Use the index change for the next opcode, reset afterwards
 }
 
 impl State {
@@ -28,7 +27,6 @@ impl State {
             index: Reg16::HL,
             displacement: 0,
             displacement_loaded: false,
-            index_changed: false
         }
     }
 }

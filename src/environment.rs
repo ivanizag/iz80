@@ -78,21 +78,11 @@ impl <'a> Environment<'_> {
 
     pub fn set_index(&mut self, index: Reg16) {
         self.state.index = index;
-        self.state.index_changed = true;
-    }
-
-    pub fn step(&mut self) {
-        if self.state.index_changed {
-            self.state.index_changed = false;
-        } else {
-            self.clear_index();
-        }
     }
 
     pub fn clear_index(&mut self) {
         self.state.index = Reg16::HL;
         self.state.displacement_loaded = false;
-        self.state.index_changed = false;
     }
 
     pub fn index_description(&self) -> String {

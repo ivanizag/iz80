@@ -39,17 +39,6 @@ impl Opcode {
     }
 }
 
-pub fn build_prefix(index: Reg16) -> Opcode {
-    Opcode {
-        name: format!("PREFIX {:?}", index),
-        action: Box::new(move |env: &mut Environment| {
-            // Change the index mode to IX or IY
-            //let d = env.advance_pc() as i8;
-            env.set_index(index /*, d*/);
-        })
-    }
-}
-
 pub fn build_nop() -> Opcode {
     Opcode {
         name: "NOP".to_string(),

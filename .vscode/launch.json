@@ -7,16 +7,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in library 'z80'",
+            "name": "Debug unit tests in library 'iz80'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
                     "--lib",
-                    "--package=z80"
+                    "--package=iz80"
                 ],
                 "filter": {
-                    "name": "z80",
+                    "name": "iz80",
                     "kind": "lib"
                 }
             },
@@ -26,15 +26,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'z80'",
+            "name": "Debug executable 'iz80'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=z80",
-                    "--package=z80"
+                    "--bin=iz80",
+                    "--package=iz80"
                 ],
                 "filter": {
-                    "name": "z80",
+                    "name": "iz80",
                     "kind": "bin"
                 }
             },
@@ -44,16 +44,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'z80'",
+            "name": "Debug unit tests in executable 'iz80'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=z80",
-                    "--package=z80"
+                    "--bin=iz80",
+                    "--package=iz80"
                 ],
                 "filter": {
-                    "name": "z80",
+                    "name": "iz80",
                     "kind": "bin"
                 }
             },
@@ -69,7 +69,7 @@
                     "test",
                     "--no-run",
                     "--test=opcodes_arith",
-                    "--package=z80"
+                    "--package=iz80"
                 ],
                 "filter": {
                     "name": "opcodes_arith",
@@ -88,7 +88,7 @@
                     "test",
                     "--no-run",
                     "--test=opcodes_bits",
-                    "--package=z80"
+                    "--package=iz80"
                 ],
                 "filter": {
                     "name": "opcodes_bits",
@@ -107,7 +107,7 @@
                     "test",
                     "--no-run",
                     "--test=opcodes_jumps",
-                    "--package=z80"
+                    "--packagei=z80"
                 ],
                 "filter": {
                     "name": "opcodes_jumps",
@@ -126,7 +126,7 @@
                     "test",
                     "--no-run",
                     "--test=opcodes_io",
-                    "--package=z80"
+                    "--package=iz80"
                 ],
                 "filter": {
                     "name": "opcodes_io",
@@ -145,7 +145,7 @@
                     "test",
                     "--no-run",
                     "--test=opcodes_ld",
-                    "--package=z80"
+                    "--package=iz80"
                 ],
                 "filter": {
                     "name": "opcodes_ld",
@@ -164,7 +164,7 @@
                     "test",
                     "--no-run",
                     "--test=opcodes",
-                    "--package=z80"
+                    "--package=iz80"
                 ],
                 "filter": {
                     "name": "opcodes",

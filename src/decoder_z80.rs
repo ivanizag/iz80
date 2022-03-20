@@ -25,7 +25,21 @@ pub struct DecoderZ80 {
 
 impl Decoder for DecoderZ80 {
     fn decode(&self, env: &mut Environment) -> &Opcode {
-        let b0 = env.advance_pc();
+        let mut b0 = env.advance_pc();
+
+        // Process prefixes even if reapeated
+        while b0 == 0xdd || b0 == 0xfd {
+            if b0 == 0xdd {
+                // DD prefix
+                env.set_index(Reg16::IX);
+                b0 = env.advance_pc()
+            } else {
+                // FD prefix
+                env.set_index(Reg16::IY);
+                b0 = env.advance_pc()
+            }
+        }
+        
         let opcode = match b0 {
             0xcb => {
                 if env.is_alt_index() {
@@ -222,9 +236,9 @@ impl DecoderZ80 {
                         0 => Some(build_push_rr(RP2[p.p])), // PUSH rr
                         1 => match p.p {
                             0 => Some(build_call()), // Call nn
-                            1 => Some(build_prefix(Reg16::IX)), // DD prefix
+                            1 => None, // DD prefix
                             2 => None, // ED prefix
-                            3 => Some(build_prefix(Reg16::IY)), // FD prefix
+                            3 => None, // FD prefix
                             _ => panic!("Unreachable")
                         },
                         _ => panic!("Unreachable")

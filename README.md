@@ -199,3 +199,13 @@ sta nnnn / lda nnnn...........  OK
 stax <b,d>....................  OK
 Tests complete
 ```
+
+### Pre-commit tests
+
+Note that some of the Zexall tests takes very long and is disabled for continuouos integrations. To run it, execute:
+
+```
+cargo test --release -- --nocapture --ignored --test zexall
+
+```
+
