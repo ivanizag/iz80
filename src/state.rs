@@ -11,6 +11,8 @@ pub struct State {
     pub halted: bool,
     /// Non maskable interrupt signaled
     pub nmi_pending: bool,
+    /// Reset signaled
+    pub reset_pending: bool,
     // Alternate index management
     pub index: Reg16, // Using HL, IX or IY
     pub displacement: i8, // Used for (IX+d) and (iY+d)
@@ -24,6 +26,7 @@ impl State {
             reg: Registers::new(),
             halted: false,
             nmi_pending: false,
+            reset_pending: false,
             index: Reg16::HL,
             displacement: 0,
             displacement_loaded: false,
