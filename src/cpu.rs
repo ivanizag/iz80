@@ -67,7 +67,17 @@ impl Cpu {
         }
 
         let mut env = Environment::new(&mut self.state, sys);
-        if env.state.nmi_pending {
+        if env.state.reset_pending {
+            env.state.reset_pending = false;
+            env.state.nmi_pending = false;
+            env.state.halted = false;
+            env.state.reg.set_pc(0x0000);
+            env.state.reg.set8(Reg8::I, 0x00);
+            env.state.reg.set8(Reg8::R, 0x00);
+            env.state.reg.set_interrupts(false);
+            env.state.reg.set_interrupt_mode(0);
+        }
+        else if env.state.nmi_pending {
             env.state.nmi_pending = false;
             env.state.halted = false;
             env.state.reg.start_nmi();
@@ -116,12 +126,17 @@ impl Cpu {
 
     /// Returns if the Cpu has executed a HALT
     pub fn is_halted(&self) -> bool {
-        self.state.halted  && !self.state.nmi_pending
+        self.state.halted && !self.state.nmi_pending && !self.state.reset_pending
     }
 
     /// Non maskable interrupt request
     pub fn signal_nmi(&mut self) {
         self.state.nmi_pending = true
+    }
+
+    /// Signal reset
+    pub fn signal_reset(&mut self) {
+        self.state.reset_pending = true
     }
 }
 
