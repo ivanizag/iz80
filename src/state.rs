@@ -16,7 +16,6 @@ pub struct State {
     // Alternate index management
     pub index: Reg16, // Using HL, IX or IY
     pub displacement: i8, // Used for (IX+d) and (iY+d)
-    pub displacement_loaded: bool, // TODO: remove
 }
 
 impl State {
@@ -29,7 +28,6 @@ impl State {
             reset_pending: false,
             index: Reg16::HL,
             displacement: 0,
-            displacement_loaded: false,
         }
     }
 }

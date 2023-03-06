@@ -44,19 +44,19 @@ const REG_COUNT8: usize = 16;
 /// 16 bit registers, composed from 8 bit registers
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Reg16 {
-    /// 16 but register AF 
+    /// 16 bit register AF
     AF = Reg8::A as isize,
-    /// 16 but register BC 
+    /// 16 bit register BC
     BC = Reg8::B as isize,
-    /// 16 but register DE 
+    /// 16 bit register DE
     DE = Reg8::D as isize,
-    /// 16 but register HL 
+    /// 16 bit register HL
     HL = Reg8::H as isize,
-    /// 16 but register IX 
+    /// 16 bit register IX
     IX = Reg8::IXH as isize,
-    /// 16 but register IY 
+    /// 16 bit register IY
     IY = Reg8::IYH as isize,
-    /// 16 but register SP
+    /// 16 bit register SP
     SP = Reg8::SPH as isize
 }
 
@@ -85,7 +85,7 @@ pub enum Flag {
 impl fmt::Display for Reg8 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Reg8::_HL => write!(f, "(HL)"),
+            Reg8::_HL => write!(f, "(__index)"),
             _ => write!(f, "{:?}", *self)
         }
     }

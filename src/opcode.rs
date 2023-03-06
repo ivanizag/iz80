@@ -14,8 +14,11 @@ impl Opcode {
     }
 
     pub fn disasm(&self, env: &Environment) -> String {
-        let name = format!("{} {}",
-            env.index_description(), self.name);
+        let name = if self.name.contains("__index") {
+            self.name.replace("__index", &env.index_description())
+        } else {
+            self.name.clone()
+        };
 
         if self.name.contains("nn") {
             // Immediate argument 16 bits

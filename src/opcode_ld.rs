@@ -67,9 +67,6 @@ pub fn build_ld_r_r(dst: Reg8, src: Reg8, _special: bool) -> Opcode {
         Opcode {
             name: format!("LD {}, {}", dst, src),
             action: Box::new(move |env: &mut Environment| {
-                env.load_displacement(src);
-                env.load_displacement(dst);
-
                 /*
                 If the next opcode makes use of (HL), it will be replaced by (IX+d), and any other
                 instances of H and L will be unaffected. Therefore, an instruction like LD IXH, (IX+d)
@@ -94,8 +91,6 @@ pub fn build_ld_r_n(r: Reg8) -> Opcode {
     Opcode {
         name: format!("LD {}, n", r),
         action: Box::new(move |env: &mut Environment| {
-            env.load_displacement(r);
-
             let value = env.advance_pc();
             env.set_reg(r, value);
         })

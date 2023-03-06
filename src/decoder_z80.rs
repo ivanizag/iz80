@@ -21,6 +21,7 @@ pub struct DecoderZ80 {
     prefix_cb: [Option<Opcode>; 256],
     prefix_cb_indexed: [Option<Opcode>; 256],
     prefix_ed: [Option<Opcode>; 256],
+    has_displacement: [bool; 256],
 }
 
 impl Decoder for DecoderZ80 {
@@ -43,7 +44,7 @@ impl Decoder for DecoderZ80 {
         let opcode = match b0 {
             0xcb => {
                 if env.is_alt_index() {
-                    env.load_displacement_forced();
+                    env.load_displacement();
                     &self.prefix_cb_indexed[env.advance_pc() as usize]
                 } else {
                     &self.prefix_cb[env.advance_pc() as usize]
@@ -53,7 +54,12 @@ impl Decoder for DecoderZ80 {
                 env.clear_index(); // With ed, the current prefix is ignored
                 &self.prefix_ed[env.advance_pc() as usize]
             },
-            _ => &self.no_prefix[b0 as usize]
+            _ => {
+                if self.has_displacement[b0 as usize] && env.is_alt_index() {
+                    env.load_displacement();
+                }
+                &self.no_prefix[b0 as usize]
+            }
         };
         match opcode {
             Some(o) => o,
@@ -140,11 +146,13 @@ impl DecoderZ80 {
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ],
+            has_displacement: [false; 256],
         };
         decoder.load_no_prefix();
         decoder.load_prefix_cb();
         decoder.load_prefix_cb_indexed();
         decoder.load_prefix_ed();
+        decoder.load_has_displacement();
         decoder
     }
 
@@ -369,6 +377,34 @@ impl DecoderZ80 {
 */
             self.prefix_ed[c as usize] = opcode;
         }
+    }
+
+    fn load_has_displacement(&mut self) {
+        self.has_displacement[0x34] = true;
+        self.has_displacement[0x35] = true;
+        self.has_displacement[0x36] = true;
+        self.has_displacement[0x46] = true;
+        self.has_displacement[0x4e] = true;
+        self.has_displacement[0x56] = true;
+        self.has_displacement[0x5e] = true;
+        self.has_displacement[0x66] = true;
+        self.has_displacement[0x6e] = true;
+        self.has_displacement[0x70] = true;
+        self.has_displacement[0x71] = true;
+        self.has_displacement[0x72] = true;
+        self.has_displacement[0x73] = true;
+        self.has_displacement[0x74] = true;
+        self.has_displacement[0x75] = true;
+        self.has_displacement[0x77] = true;
+        self.has_displacement[0x7e] = true;
+        self.has_displacement[0x86] = true;
+        self.has_displacement[0x8e] = true;
+        self.has_displacement[0x96] = true;
+        self.has_displacement[0x9e] = true;
+        self.has_displacement[0xa6] = true;
+        self.has_displacement[0xae] = true;
+        self.has_displacement[0xb6] = true;
+        self.has_displacement[0xbe] = true;
     }
 }
 

@@ -46,8 +46,6 @@ pub fn build_inc_r(r: Reg8) -> Opcode {
     Opcode {
         name: format!("INC {}", r),
         action: Box::new(move |env: &mut Environment| {
-            env.load_displacement(r);
-
             let a = env.reg8_ext(r);
             let v = operator_inc(env, a);
             env.set_reg(r, v);
@@ -59,8 +57,6 @@ pub fn build_dec_r(r: Reg8) -> Opcode {
     Opcode {
         name: format!("DEC {}", r),
         action: Box::new(move |env: &mut Environment| {
-            env.load_displacement(r);
-
             let a = env.reg8_ext(r);
             let v = operator_dec(env, a);
             env.set_reg(r, v);

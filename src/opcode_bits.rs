@@ -27,8 +27,6 @@ pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast
     Opcode {
         name: full_name,
         action: Box::new(move |env: &mut Environment| {
-            env.load_displacement(r);
-
             let mut v = if indexed {
                 env.reg8_ext(Reg8::_HL)
             } else {
@@ -87,8 +85,6 @@ pub fn build_bit_r(n: u8, r: Reg8) -> Opcode {
     Opcode {
         name: format!("BIT {}, {}", n, r),
         action: Box::new(move |env: &mut Environment| {
-            env.load_displacement(r);
-
             let v = env.reg8_ext(r);
             let z = v & (1<<n);
             env.state.reg.put_flag(Flag::S, (z & 0x80) != 0);
@@ -127,8 +123,6 @@ pub fn build_set_res_r(bit: u8, r: Reg8, value: bool) -> Opcode {
     Opcode {
         name: format!("{} {}, {}", name, bit, r),
         action: Box::new(move |env: &mut Environment| {
-            env.load_displacement(r);
-
             let mut v = env.reg8_ext(r);
             if value {
                 v = v | (1<<bit);
@@ -152,8 +146,6 @@ pub fn build_indexed_set_res_r(bit: u8, r: Reg8, value: bool) -> Opcode {
             to register r, even the new byte cannot be written at the said
             address (e.g. when it points to a ROM location).
             */
-            env.load_displacement(r);
-
             let mut v = env.reg8_ext(Reg8::_HL);
             if value {
                 v = v | (1<<bit);

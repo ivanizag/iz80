@@ -19,8 +19,6 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
         Opcode {
             name: format!("{} A, {}", name, r),
             action: Box::new(move |env: &mut Environment| {
-                env.load_displacement(r);
-
                 let a = env.state.reg.a();
                 let b = env.reg8_ext(r);
                 let v = op(env, a, b);

@@ -55,11 +55,11 @@ impl Cpu {
 
 
     /// Executes a single instruction
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `sys` - A representation of the emulated machine that has the Machine trait
-    ///  
+    ///
     pub fn execute_instruction(&mut self, sys: &mut dyn Machine) {
         if self.is_halted() {
             // The CPU is in HALT state. Only interrupts can execute.
@@ -107,6 +107,18 @@ impl Cpu {
             println!(" [{:02x} {:02x} {:02x}]", sys.peek(pc),
                 sys.peek(pc.wrapping_add(1)), sys.peek(pc.wrapping_add(2)));
         }
+    }
+
+    /// Returns the instrction in PC disassembled. PC is advanced.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `sys` - A representation of the emulated machine that has the Machine trait
+    ///  
+    pub fn disasm_instruction(&mut self, sys: &mut dyn Machine) -> String {
+        let mut env = Environment::new(&mut self.state, sys);
+        let opcode = self.decoder.decode(&mut env);
+        opcode.disasm(&mut env)
     }
 
     /// Activates or deactivates traces of the instruction executed and
