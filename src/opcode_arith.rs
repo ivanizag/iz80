@@ -65,7 +65,7 @@ pub fn build_dec_r(r: Reg8) -> Opcode {
 }
 
 pub fn build_inc_dec_rr(rr: Reg16, inc: bool) -> Opcode {
-    let delta = if inc {1} else {-1 as i16 as u16};
+    let delta = if inc {1} else {-1_i16 as u16};
     let mnemonic = if inc {"INC"} else {"DEC"};
     Opcode {
         name: format!("{} {:?}", mnemonic, rr),

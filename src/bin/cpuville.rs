@@ -13,7 +13,7 @@ use std::time::Duration;
 use iz80::Cpu;
 use iz80::Machine;
 
-static TINY_BASIC: &'static [u8] = include_bytes!("rom/tinybasic2dms.bin");
+static TINY_BASIC: &[u8] = include_bytes!("rom/tinybasic2dms.bin");
 
 fn main() {
     let mut machine = VilleMachine::new();
@@ -26,9 +26,8 @@ fn main() {
 
     // Load program
     let code = TINY_BASIC;
-    let size = code.len();
-    for i in 0..size {
-        machine.poke(0x0000 + i as u16, code[i]);
+    for (i, e) in code.iter().enumerate() {
+        machine.poke(i as u16, *e);
     }
 
     // Init

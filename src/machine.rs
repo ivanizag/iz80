@@ -49,6 +49,12 @@ impl PlainMachine {
     }
 }
 
+impl Default for PlainMachine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Machine for PlainMachine {
     fn peek(&self, address: u16) -> u8 {
         self.mem[address as usize]

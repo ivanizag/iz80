@@ -1,7 +1,7 @@
 use super::environment::*;
 use super::registers::*;
 
-type OpcodeFn = dyn Fn(&mut Environment) -> ();
+type OpcodeFn = dyn Fn(&mut Environment);
 
 pub struct Opcode {
     pub name: String,
@@ -25,17 +25,17 @@ impl Opcode {
             let nn = env.peek16_pc();
             let nn_str = format!("{:04x}h", nn);
             name.replace("nn", &nn_str)
-        } else if self.name.contains("n") {
+        } else if self.name.contains('n') {
             // Immediate argument 8 bits
             let n = env.peek_pc();
             let n_str = format!("{:02x}h", n);
-            name.replace("n", &n_str)
-        } else if self.name.contains("d") {
+            name.replace('n', &n_str)
+        } else if self.name.contains('d') {
             // Immediate argument 8 bits signed
             // In assembly it's shown with 2 added as if it were from the opcode pc.
             let d = env.peek_pc() as i8 as i16 + 2;
             let d_str = format!("{:+x}", d);
-            name.replace("d", &d_str)
+            name.replace('d', &d_str)
         } else {
             name
         }

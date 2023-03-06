@@ -25,11 +25,7 @@ impl Cpu {
 
     /// Returns a Z80 Cpu instance. Alias of new_z80()
     pub fn new() -> Cpu {
-        Cpu {
-            state: State::new(),
-            trace: false,
-            decoder: Box::new(DecoderZ80::new())
-        }
+        Self::new_z80()
     }
 
     /// Returns a Z80 Cpu instance
@@ -53,7 +49,15 @@ impl Cpu {
         cpu
     }
 
+}
 
+impl Default for Cpu {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Cpu {
     /// Executes a single instruction
     ///
     /// # Arguments
@@ -87,7 +91,7 @@ impl Cpu {
         let pc = env.state.reg.pc();
         let opcode = self.decoder.decode(&mut env);
         if self.trace {
-            print!("==> {:04x}: {:20}", pc, opcode.disasm(&mut env));
+            print!("==> {:04x}: {:20}", pc, opcode.disasm(&env));
         }
         opcode.execute(&mut env);
         env.clear_index();
@@ -118,7 +122,7 @@ impl Cpu {
     pub fn disasm_instruction(&mut self, sys: &mut dyn Machine) -> String {
         let mut env = Environment::new(&mut self.state, sys);
         let opcode = self.decoder.decode(&mut env);
-        opcode.disasm(&mut env)
+        opcode.disasm(&env)
     }
 
     /// Activates or deactivates traces of the instruction executed and

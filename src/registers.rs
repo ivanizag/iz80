@@ -1,7 +1,7 @@
-use std::fmt;
+use std::{fmt, mem};
 
 /// 8 bit registers
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Reg8 {
     /// 8 bit register A
     A = 0,
@@ -42,7 +42,7 @@ const REG_COUNT8: usize = 16;
 
 
 /// 16 bit registers, composed from 8 bit registers
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Reg16 {
     /// 16 bit register AF
     AF = Reg8::A as isize,
@@ -204,14 +204,10 @@ impl Registers {
 
     pub(crate) fn swap(&mut self, rr: Reg16) {
         let ih = rr as usize;
-        let temp = self.data[ih];
-        self.data[ih] = self.shadow[ih];
-        self.shadow[ih] = temp;
+        mem::swap(&mut self.data[ih], &mut self.shadow[ih]);
 
         let il = rr as usize + 1;
-        let temp = self.data[il];
-        self.data[il] = self.shadow[il];
-        self.shadow[il] = temp;
+        mem::swap(&mut self.data[il], &mut self.shadow[il]);
     }
 
     /// Returns the value of a flag

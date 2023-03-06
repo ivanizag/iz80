@@ -17,13 +17,13 @@ pub enum ShiftDir {
 }
 
 pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast: bool, indexed: bool) -> Opcode {
-    let full_name: String;
-    if indexed {
-        full_name = format!("LD {}, {} {}", r, name, Reg8::_HL);
+    let full_name = if indexed {
+        format!("LD {}, {} {}", r, name, Reg8::_HL)
     } else {
         let separator = if fast {""} else {" "};
-        full_name = format!("{}{}{}", name, separator, r);
-    }
+        format!("{}{}{}", name, separator, r)
+    };
+
     Opcode {
         name: full_name,
         action: Box::new(move |env: &mut Environment| {
@@ -37,7 +37,7 @@ pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast
             match dir {
                 ShiftDir::Left => {
                     let upper_bit = v >= 0x80;
-                    v = v << 1;
+                    v <<= 1;
                     let set_lower_bit = match mode {
                         ShiftMode::Arithmetic => false, // always 0 in bit 0
                         ShiftMode::Logical => true, // always 1 in bit 0
@@ -45,14 +45,14 @@ pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast
                         ShiftMode::RotateCarry => upper_bit, // bit 7 moves to bit 0
                     };
                     if set_lower_bit { // bit 0 is 0 already
-                        v = v | 1;
+                        v |= 1;
                     }
                     carry = upper_bit;
                 },
                 ShiftDir::Right => {
                     let upper_bit = v >= 0x80;
                     let lower_bit = (v & 1) == 1;
-                    v = v >> 1;
+                    v >>= 1;
                     let set_upper_bit = match mode {
                         ShiftMode::Arithmetic => upper_bit, // extend bit 7
                         ShiftMode::Logical => false, // always 0 in bit 7
@@ -60,11 +60,11 @@ pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast
                         ShiftMode::RotateCarry => lower_bit, // bit 0 goes to bit 7
                     };
                     if set_upper_bit { // bit 7 is 0 already
-                        v = v | 0x80;
+                        v |= 0x80;
                     }
                     carry = lower_bit;
                 }
-            }
+            };
             if indexed && r != Reg8::_HL {
                 env.set_reg(Reg8::_HL, v);
             }
@@ -125,9 +125,9 @@ pub fn build_set_res_r(bit: u8, r: Reg8, value: bool) -> Opcode {
         action: Box::new(move |env: &mut Environment| {
             let mut v = env.reg8_ext(r);
             if value {
-                v = v | (1<<bit);
+                v |= 1<<bit;
             } else {
-                v = v & !(1<<bit);
+                v &= !(1<<bit);
             }
 
             env.set_reg(r, v);
@@ -148,9 +148,9 @@ pub fn build_indexed_set_res_r(bit: u8, r: Reg8, value: bool) -> Opcode {
             */
             let mut v = env.reg8_ext(Reg8::_HL);
             if value {
-                v = v | (1<<bit);
+                v |= 1<<bit;
             } else {
-                v = v & !(1<<bit);
+                v &= !(1<<bit);
             }
             env.set_reg(Reg8::_HL, v);
             if r != Reg8::_HL {
