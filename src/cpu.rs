@@ -140,6 +140,11 @@ impl Cpu {
         &mut self.state.reg
     }
 
+    /// Returns an immutable references to Registers struct to read the Z80 registers
+    pub fn immutable_registers(&self) -> &Registers {
+        &self.state.reg
+    }
+
     /// Returns if the Cpu has executed a HALT
     pub fn is_halted(&self) -> bool {
         self.state.halted && !self.state.nmi_pending && !self.state.reset_pending
