@@ -12,12 +12,16 @@ use std::time::Duration;
 
 use iz80::Cpu;
 use iz80::Machine;
+use iz80::TimedRunner;
 
 static TINY_BASIC: &[u8] = include_bytes!("rom/tinybasic2dms.bin");
+const MHZ: f64 = 4.0;
 
 fn main() {
     let mut machine = VilleMachine::new();
     let mut cpu = Cpu::new();
+    let mut timed_runner = TimedRunner::new();
+    timed_runner.set_mhz(&cpu, MHZ, 1000);
 
     // Init console
     let mut stdout = stdout();
@@ -35,7 +39,7 @@ fn main() {
     machine.in_values[3] = 1; // TX Ready
 
     loop {
-        cpu.execute_instruction(&mut machine);
+        timed_runner.execute(&mut cpu, &mut machine);
 
         if let Some(port) = machine.out_port {
             match port {
@@ -60,7 +64,9 @@ fn main() {
             machine.in_port = None;
 
             // Avoid 100% CPU usage waiting for input.
-            thread::sleep(Duration::from_millis(1));  
+            if MHZ == 0.0 {
+                thread::sleep(Duration::from_millis(1));  
+            }
         }
 
         if !in_char_waiting {

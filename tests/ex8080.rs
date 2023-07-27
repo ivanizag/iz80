@@ -92,6 +92,7 @@ fn test_ex8080() {
             }
         }
     }
+    println!("Cycles: {}", cpu.cycle_count());
 
     if run_single_test {
         assert_eq!(1, tests_passed);

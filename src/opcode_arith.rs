@@ -5,95 +5,95 @@ use super::registers::*;
 
 // 16 bit ADD opcodes
 pub fn build_add_hl_rr(rr: Reg16) -> Opcode {
-    Opcode {
-        name: format!("ADD HL, {:?}", rr),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("ADD HL, {:?}", rr),
+        Box::new(move |env: &mut Environment| {
             let aa = env.index_value();
             let bb = env.reg16_ext(rr);
             let vv = operator_add16(env, aa, bb);
             env.set_reg16(Reg16::HL, vv);
         })
-    }
+    )
 }
 
 pub fn build_adc_hl_rr(rr: Reg16) -> Opcode {
-    Opcode {
-        name: format!("ADC HL, {:?}", rr),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("ADC HL, {:?}", rr),
+        Box::new(move |env: &mut Environment| {
             let aa = env.index_value(); // This will always be HL.
             let bb = env.reg16_ext(rr);
             let vv = operator_adc16(env, aa, bb);
             env.state.reg.set16(Reg16::HL, vv);
         })
-    }
+    )
 }
 
 pub fn build_sbc_hl_rr(rr: Reg16) -> Opcode {
-    Opcode {
-        name: format!("SBC HL, {:?}", rr),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("SBC HL, {:?}", rr),
+        Box::new(move |env: &mut Environment| {
             let aa = env.index_value(); // This will always be HL.
             let bb = env.reg16_ext(rr);
             let vv = operator_sbc16(env, aa, bb);
             env.state.reg.set16(Reg16::HL, vv);
         })
-    }
+    )
 }
 
 
 // INC, DEC opcodes
 pub fn build_inc_r(r: Reg8) -> Opcode {
-    Opcode {
-        name: format!("INC {}", r),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("INC {}", r),
+        Box::new(move |env: &mut Environment| {
             let a = env.reg8_ext(r);
             let v = operator_inc(env, a);
             env.set_reg(r, v);
         })
-    }
+    )
 }
 
 pub fn build_dec_r(r: Reg8) -> Opcode {
-    Opcode {
-        name: format!("DEC {}", r),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("DEC {}", r),
+        Box::new(move |env: &mut Environment| {
             let a = env.reg8_ext(r);
             let v = operator_dec(env, a);
             env.set_reg(r, v);
         })
-    }
+    )
 }
 
 pub fn build_inc_dec_rr(rr: Reg16, inc: bool) -> Opcode {
     let delta = if inc {1} else {-1_i16 as u16};
     let mnemonic = if inc {"INC"} else {"DEC"};
-    Opcode {
-        name: format!("{} {:?}", mnemonic, rr),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("{} {:?}", mnemonic, rr),
+        Box::new(move |env: &mut Environment| {
             let mut v = env.reg16_ext(rr);
             v = v.wrapping_add(delta);
             env.set_reg16(rr, v);
             // Note: flags not affected on the 16 bit INC and DEC
         })
-    }    
-}    
+    )
+}
 
 // Misc. opcodes
 pub fn build_neg() -> Opcode {
-    Opcode {
-        name: "NEG".to_string(),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        "NEG".to_string(),
+        Box::new(move |env: &mut Environment| {
             let b = env.state.reg.a();
             let v = operator_sub(env, 0, b);
             env.state.reg.set_a(v);
         })
-    }
+    )
 }
 
 pub fn build_daa() -> Opcode {
-    Opcode {
-        name: "DAA".to_string(),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        "DAA".to_string(),
+        Box::new(move |env: &mut Environment| {
             // See TUZD-4.7
             let a = env.state.reg.a();
             let hi = a >> 4;
@@ -123,13 +123,13 @@ pub fn build_daa() -> Opcode {
 
             // N unchanged
         })
-    }
+    )
 }
 
 pub fn build_daa8080() -> Opcode {
-    Opcode {
-        name: "DAA".to_string(),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        "DAA".to_string(),
+        Box::new(move |env: &mut Environment| {
             // See TUZD-4.7
             let a = env.state.reg.a();
             let hi = a >> 4;
@@ -148,5 +148,5 @@ pub fn build_daa8080() -> Opcode {
             env.state.reg.put_flag(Flag::C, cf || hi6);
 
         })
-    }
+    )
 }

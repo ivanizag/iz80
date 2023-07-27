@@ -7,6 +7,9 @@ use super::registers::*;
 pub struct State {
     /// Values of the Z80 registers
     pub reg: Registers,
+    /// Cycle counter
+    pub cycle: u64,
+    pub branch_taken: bool,
     /// Halt state of the CPU
     pub halted: bool,
     /// Non maskable interrupt signaled
@@ -23,6 +26,8 @@ impl State {
     pub fn new() -> State {
         State {
             reg: Registers::new(),
+            cycle: 0,
+            branch_taken: false,
             halted: false,
             nmi_pending: false,
             reset_pending: false,

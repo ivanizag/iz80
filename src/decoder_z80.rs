@@ -153,6 +153,8 @@ impl DecoderZ80 {
         decoder.load_prefix_cb_indexed();
         decoder.load_prefix_ed();
         decoder.load_has_displacement();
+        decoder.load_cycle_information();
+
         decoder
     }
 
@@ -406,6 +408,76 @@ impl DecoderZ80 {
         self.has_displacement[0xb6] = true;
         self.has_displacement[0xbe] = true;
     }
+
+    fn load_cycle_information(&mut self) {
+
+        // Load cycle information
+        for c in 0..=255 {
+            if let Some(opcode) = &mut self.no_prefix[c as usize] {
+                opcode.cycles = NO_PREFIX_CYCLES[c];
+                opcode.cycles_conditional = opcode.cycles;
+            }
+            if let Some(opcode) = &mut self.prefix_cb[c as usize] {
+                opcode.cycles = PREFIX_CB_CYCLES[c];
+                opcode.cycles_conditional = opcode.cycles;
+            }
+            if let Some(opcode) = &mut self.prefix_cb_indexed[c as usize] {
+                // 23 cycles except for BIT that is 20
+                opcode.cycles = if (c & 0xc0) == 0x40 {20} else {23};
+                opcode.cycles_conditional = opcode.cycles;
+            }
+            if let Some(opcode) = &mut self.prefix_ed[c as usize] {
+                opcode.cycles = PREFIX_ED_CYCLES[c];
+                opcode.cycles_conditional = opcode.cycles;
+            }
+        }
+
+        //Load cycle information for conditional cases
+        if let Some(opcode) = &mut self.no_prefix[0x10] { opcode.cycles_conditional = 8; }
+        if let Some(opcode) = &mut self.no_prefix[0x20] { opcode.cycles_conditional = 8; }
+        if let Some(opcode) = &mut self.no_prefix[0x28] { opcode.cycles_conditional = 8; }
+        if let Some(opcode) = &mut self.no_prefix[0x30] { opcode.cycles_conditional = 8; }
+        if let Some(opcode) = &mut self.no_prefix[0x38] { opcode.cycles_conditional = 8; }
+
+        if let Some(opcode) = &mut self.no_prefix[0xc0] { opcode.cycles_conditional =  5; }
+        if let Some(opcode) = &mut self.no_prefix[0xc2] { opcode.cycles_conditional =  7; }
+        if let Some(opcode) = &mut self.no_prefix[0xc4] { opcode.cycles_conditional = 10; }
+        if let Some(opcode) = &mut self.no_prefix[0xc8] { opcode.cycles_conditional =  5; }
+        if let Some(opcode) = &mut self.no_prefix[0xca] { opcode.cycles_conditional =  7; }
+        if let Some(opcode) = &mut self.no_prefix[0xcc] { opcode.cycles_conditional = 10; }
+
+        if let Some(opcode) = &mut self.no_prefix[0xd0] { opcode.cycles_conditional =  5; }
+        if let Some(opcode) = &mut self.no_prefix[0xd2] { opcode.cycles_conditional =  7; }
+        if let Some(opcode) = &mut self.no_prefix[0xd4] { opcode.cycles_conditional = 10; }
+        if let Some(opcode) = &mut self.no_prefix[0xd8] { opcode.cycles_conditional =  5; }
+        if let Some(opcode) = &mut self.no_prefix[0xda] { opcode.cycles_conditional =  7; }
+        if let Some(opcode) = &mut self.no_prefix[0xdc] { opcode.cycles_conditional = 10; }
+
+        if let Some(opcode) = &mut self.no_prefix[0xe0] { opcode.cycles_conditional =  5; }
+        if let Some(opcode) = &mut self.no_prefix[0xe2] { opcode.cycles_conditional =  7; }
+        if let Some(opcode) = &mut self.no_prefix[0xe4] { opcode.cycles_conditional = 10; }
+        if let Some(opcode) = &mut self.no_prefix[0xe8] { opcode.cycles_conditional =  5; }
+        if let Some(opcode) = &mut self.no_prefix[0xea] { opcode.cycles_conditional =  7; }
+        if let Some(opcode) = &mut self.no_prefix[0xec] { opcode.cycles_conditional = 10; }
+
+        if let Some(opcode) = &mut self.no_prefix[0xf0] { opcode.cycles_conditional =  5; }
+        if let Some(opcode) = &mut self.no_prefix[0xf2] { opcode.cycles_conditional =  7; }
+        if let Some(opcode) = &mut self.no_prefix[0xf4] { opcode.cycles_conditional = 10; }
+        if let Some(opcode) = &mut self.no_prefix[0xf8] { opcode.cycles_conditional =  5; }
+        if let Some(opcode) = &mut self.no_prefix[0xfa] { opcode.cycles_conditional =  7; }
+        if let Some(opcode) = &mut self.no_prefix[0xfc] { opcode.cycles_conditional = 10; }
+
+        if let Some(opcode) = &mut self.prefix_ed[0xb0] { opcode.cycles_conditional = 16; }
+        if let Some(opcode) = &mut self.prefix_ed[0xb1] { opcode.cycles_conditional = 16; }
+        if let Some(opcode) = &mut self.prefix_ed[0xb2] { opcode.cycles_conditional = 16; }
+        if let Some(opcode) = &mut self.prefix_ed[0xb3] { opcode.cycles_conditional = 16; }
+
+        if let Some(opcode) = &mut self.prefix_ed[0xb8] { opcode.cycles_conditional = 16; }
+        if let Some(opcode) = &mut self.prefix_ed[0xb9] { opcode.cycles_conditional = 16; }
+        if let Some(opcode) = &mut self.prefix_ed[0xba] { opcode.cycles_conditional = 16; }
+        if let Some(opcode) = &mut self.prefix_ed[0xbb] { opcode.cycles_conditional = 16; }
+
+    }
 }
 
 #[derive(Debug)]
@@ -431,12 +503,12 @@ impl DecodingHelper {
 }
 
 
-pub const RP:  [Reg16; 4] = [Reg16::BC, Reg16::DE, Reg16::HL, Reg16::SP];
-pub const RP2: [Reg16; 4] = [Reg16::BC, Reg16::DE, Reg16::HL, Reg16::AF];
-pub const R:  [Reg8; 8] = [Reg8::B, Reg8::C, Reg8::D, Reg8::E, Reg8::H, Reg8::L, Reg8::_HL, Reg8::A];
-pub const IM: [u8; 8] = [0, 0, 1, 2, 0, 0, 1, 2];
+const RP:  [Reg16; 4] = [Reg16::BC, Reg16::DE, Reg16::HL, Reg16::SP];
+const RP2: [Reg16; 4] = [Reg16::BC, Reg16::DE, Reg16::HL, Reg16::AF];
+const R:  [Reg8; 8] = [Reg8::B, Reg8::C, Reg8::D, Reg8::E, Reg8::H, Reg8::L, Reg8::_HL, Reg8::A];
+const IM: [u8; 8] = [0, 0, 1, 2, 0, 0, 1, 2];
 
-pub const CC: [(Flag, bool, &str); 8] = [
+const CC: [(Flag, bool, &str); 8] = [
     (Flag::Z, false, "NZ"),
     (Flag::Z, true,  "Z"),
     (Flag::C, false, "NC"),
@@ -447,7 +519,7 @@ pub const CC: [(Flag, bool, &str); 8] = [
     (Flag::S, true,  "N")
 ];
 
-pub const ROT: [(ShiftDir, ShiftMode, &str); 8] = [
+const ROT: [(ShiftDir, ShiftMode, &str); 8] = [
     (ShiftDir::Left,  ShiftMode::RotateCarry, "RLC"),
     (ShiftDir::Right, ShiftMode::RotateCarry, "RRC"),
     (ShiftDir::Left,  ShiftMode::Rotate,      "RL" ),
@@ -458,8 +530,7 @@ pub const ROT: [(ShiftDir, ShiftMode, &str); 8] = [
     (ShiftDir::Right, ShiftMode::Logical,     "SRL"),
 ];
 
-//pub const ALU: [(fn(&mut State, u8, u8) -> u8, &'static str); 8] = [
-pub const ALU: [(Operator, &str); 8] = [
+const ALU: [(Operator, &str); 8] = [
     (operator_add, "ADD"),
     (operator_adc, "ADC"),
     (operator_sub, "SUB"),
@@ -470,9 +541,68 @@ pub const ALU: [(Operator, &str); 8] = [
     (operator_cp,  "CP")
 ];
 
-pub const BLI_A: [(bool, bool, &str); 4] = [
+const BLI_A: [(bool, bool, &str); 4] = [
     (true,  false, "I"),
     (false, false, "D"),
     (true,  true, "IR"),
     (false, true, "DR")
+];
+
+
+// From https://spectrumforeveryone.com/technical/z80-processor-instructions/
+const NO_PREFIX_CYCLES: [u8; 256] = [
+     4, 10,  7,  6,  4,  4,  7,  4,  4, 11,  7,  6,  4,  4,  7,  4,
+    13, 10,  7,  6,  4,  4,  7,  4, 12, 11,  7,  6,  4,  4,  7,  4,
+    12, 10, 16,  6,  4,  4,  7,  4, 12, 11, 16,  6,  4,  4,  7,  4,
+    12, 10, 13,  6, 11, 11, 10,  4, 12, 11, 13,  6,  4,  4,  7,  4,
+     4,  4,  4,  4,  4,  4,  7,  4,  4,  4,  4,  4,  4,  4,  7,  4,
+     4,  4,  4,  4,  4,  4,  7,  4,  4,  4,  4,  4,  4,  4,  7,  4,
+     4,  4,  4,  4,  4,  4,  7,  4,  4,  4,  4,  4,  4,  4,  7,  4,
+     7,  7,  7,  7,  7,  7,  4,  7,  4,  4,  4,  4,  4,  4,  7,  4,
+     4,  4,  4,  4,  4,  4,  7,  4,  4,  4,  4,  4,  4,  4,  7,  4,
+     4,  4,  4,  4,  4,  4,  7,  4,  4,  4,  4,  4,  4,  4,  7,  4,
+     4,  4,  4,  4,  4,  4,  7,  4,  4,  4,  4,  4,  4,  4,  7,  4,
+     4,  4,  4,  4,  4,  4,  7,  4,  4,  4,  4,  4,  4,  4,  7,  4,
+    11, 10, 12, 10, 17, 11,  7, 11, 11, 10, 12,  0, 17, 17,  7, 11,
+    11, 10, 12, 11, 17, 11,  7, 11, 11,  4, 12, 11, 17 , 0,  7, 11,
+    11, 10, 12, 19, 17, 11,  7, 11, 11,  4, 12,  4, 17,  0,  7, 11,
+    11, 10, 12,  4, 17, 11,  7, 11, 11,  6, 12,  4, 17,  0,  7, 11,
+];
+
+const PREFIX_CB_CYCLES: [u8; 256] = [
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 12,  8,  8,  8,  8,  8,  8,  8, 12,  8,
+     8,  8,  8,  8,  8,  8, 12,  8,  8,  8,  8,  8,  8,  8, 12,  8,
+     8,  8,  8,  8,  8,  8, 12,  8,  8,  8,  8,  8,  8,  8, 12,  8,
+     8,  8,  8,  8,  8,  8, 12,  8,  8,  8,  8,  8,  8,  8, 12,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+     8,  8,  8,  8,  8,  8, 15,  8,  8,  8,  8,  8,  8,  8, 15,  8,
+];
+
+const PREFIX_ED_CYCLES: [u8; 256] = [
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    12, 12, 15, 20,  8, 14,  8,  9, 12, 12, 15, 20,  8, 14,  8,  9,
+    12, 12, 15, 20,  8, 14,  8,  9, 12, 12, 15, 20,  8, 14,  8,  9,
+    12, 12, 15, 20,  8, 14,  8, 18, 12, 12, 15, 20,  8, 14,  8, 18,
+    12, 12, 15, 20,  8, 14,  8,  0, 12, 12, 15, 20,  8, 14,  8,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    16, 16, 16, 16,  0,  0,  0,  0, 16, 16, 16, 16,  0,  0,  0,  0,
+    21, 21, 21, 21,  0,  0,  0,  0, 21, 21, 21, 21,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 ];

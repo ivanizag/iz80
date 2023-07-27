@@ -5,10 +5,21 @@ type OpcodeFn = dyn Fn(&mut Environment);
 
 pub struct Opcode {
     pub name: String,
+    pub cycles: u8,
+    pub cycles_conditional: u8,
     pub action: Box<OpcodeFn>,
 }
 
 impl Opcode {
+    pub(crate) fn new(name: String, action: Box<OpcodeFn>) -> Opcode {
+        Opcode {
+            name,
+            cycles: 0,
+            cycles_conditional: 0,
+            action,
+        }
+    }
+
     pub fn execute(&self, env: &mut Environment) {
         (self.action)(env);
     }
@@ -43,67 +54,67 @@ impl Opcode {
 }
 
 pub fn build_nop() -> Opcode {
-    Opcode {
-        name: "NOP".to_string(),
-        action: Box::new(|_: &mut Environment| {
+    Opcode::new(
+        "NOP".to_string(),
+        Box::new(|_: &mut Environment| {
             // Nothing done
         })
-    }
+    )
 }
 
 pub fn build_noni_nop() -> Opcode {
-    Opcode {
-        name: "NONINOP".to_string(),
-        action: Box::new(|_: &mut Environment| {
+    Opcode::new(
+        "NONINOP".to_string(),
+        Box::new(|_: &mut Environment| {
             // Nothing done
         })
-    }
+    )
 }
 
 pub fn build_halt() -> Opcode {
-    Opcode {
-        name: "HALT".to_string(),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        "HALT".to_string(),
+        Box::new(move |env: &mut Environment| {
             env.state.halted = true;
         })
-    }
+    )
 }
 
 pub fn build_pop_rr(rr: Reg16) -> Opcode {
-    Opcode {
-        name: format!("POP {:?}", rr),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("POP {:?}", rr),
+        Box::new(move |env: &mut Environment| {
             let value = env.pop();
             env.set_reg16(rr, value);
         })
-    }
+    )
 }
 
 pub fn build_push_rr(rr: Reg16) -> Opcode {
-    Opcode {
-        name: format!("PUSH {:?}", rr),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("PUSH {:?}", rr),
+        Box::new(move |env: &mut Environment| {
             let value = env.reg16_ext(rr);
             env.push(value);
         })
-    }
+    )
 }
 
 pub fn build_conf_interrupts(enable: bool) -> Opcode {
     let name = if enable {"EI"} else  {"DI"};
-    Opcode {
-        name: name.to_string(),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        name.to_string(),
+        Box::new(move |env: &mut Environment| {
             env.state.reg.set_interrupts(enable);
         })
-    }
+    )
 }
 
 pub fn build_im(im: u8) -> Opcode {
-    Opcode {
-        name: format!("IM {}", im),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("IM {}", im),
+        Box::new(move |env: &mut Environment| {
             env.state.reg.set_interrupt_mode(im);
         })
-    }
+    )
 }
