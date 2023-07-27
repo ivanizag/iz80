@@ -6,46 +6,46 @@ use super::operators::*;
 pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
     if r != Reg8::_HL && r != Reg8::H && r != Reg8::L {
         // Fast version
-        Opcode {
-            name: format!("{} A, {}", name, r),
-            action: Box::new(move |env: &mut Environment| {
+        Opcode::new(
+            format!("{} A, {}", name, r),
+            Box::new(move |env: &mut Environment| {
                 let a = env.state.reg.a();
                 let b = env.state.reg.get8(r);
                 let v = op(env, a, b);
                 env.state.reg.set_a(v);
             })
-        }
+        )
     } else {
-        Opcode {
-            name: format!("{} A, {}", name, r),
-            action: Box::new(move |env: &mut Environment| {
+        Opcode::new(
+            format!("{} A, {}", name, r),
+            Box::new(move |env: &mut Environment| {
                 let a = env.state.reg.a();
                 let b = env.reg8_ext(r);
                 let v = op(env, a, b);
 
                 env.state.reg.set_a(v);
             })
-        }
+        )
     }
 }
 
 pub fn build_operator_a_n((op, name): (Operator, &str)) -> Opcode {
-    Opcode {
-        name: format!("{} A, n", name),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("{} A, n", name),
+        Box::new(move |env: &mut Environment| {
             let a = env.state.reg.a();
             let b = env.advance_pc();
             let v = op(env, a, b);
 
             env.state.reg.set_a(v);
         })
-    }
+    )
 }
 
 pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Opcode {
-    Opcode {
-        name: format!("CP{}", postfix),
-        action: Box::new(move |env: &mut Environment| {
+    Opcode::new(
+        format!("CP{}", postfix),
+        Box::new(move |env: &mut Environment| {
             let a = env.state.reg.a();
             let b = env.reg8_ext(Reg8::_HL);
             let c_bak = env.state.reg.get_flag(Flag::C);
@@ -66,9 +66,10 @@ pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
 
             if repeat && bc != 0 &&  a != b {
                 // Back to redo the instruction
+                env.set_branch_taken();
                 let pc = env.state.reg.pc().wrapping_sub(2);
                 env.state.reg.set_pc(pc);
             }
         })
-    }
+    )
 }

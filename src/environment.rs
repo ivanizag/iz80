@@ -1,4 +1,5 @@
 use super::machine::*;
+use super::opcode::Opcode;
 use super::registers::*;
 use super::state::State;
 
@@ -83,6 +84,24 @@ impl <'a> Environment<'_> {
     pub fn clear_index(&mut self) {
         self.state.index = Reg16::HL;
     }
+
+    pub fn clear_branch_taken(&mut self) {
+        self.state.branch_taken = false;
+    }
+
+    pub fn set_branch_taken(&mut self) {
+        self.state.branch_taken = true;
+    }
+
+    pub fn advance_cycles(&mut self, opcode: &Opcode) {
+        let cycles = if self.state.branch_taken {
+            opcode.cycles
+        } else {
+            opcode.cycles_conditional
+        };
+        self.state.cycle = self.state.cycle.wrapping_add(cycles as u64);
+    }
+
 
     pub fn index_description(&self) -> String {
         if self.state.index == Reg16::HL {

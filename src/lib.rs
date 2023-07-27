@@ -43,7 +43,7 @@ mod cpu;
 mod machine;
 mod registers;
 mod state;
-
+mod timed_runner;
 
 mod decoder_z80;
 mod decoder_8080;
@@ -61,3 +61,4 @@ pub use cpu::Cpu;
 pub use machine::Machine;
 pub use machine::PlainMachine;
 pub use registers::*;
+pub use timed_runner::TimedRunner;

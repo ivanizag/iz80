@@ -93,11 +93,14 @@ impl Cpu {
         if self.trace {
             print!("==> {:04x}: {:20}", pc, opcode.disasm(&env));
         }
+
+        env.clear_branch_taken();
         opcode.execute(&mut env);
+        env.advance_cycles(opcode);
         env.clear_index();
 
         if self.trace {
-            print!(" PC:{:04x} AF:{:04x} BC:{:04x} DE:{:04x} HL:{:04x} SP:{:04x} IX:{:04x} IY:{:04x} Flags:{:08b}",
+            print!(" PC:{:04x} AF:{:04x} BC:{:04x} DE:{:04x} HL:{:04x} SP:{:04x} IX:{:04x} IY:{:04x} Flags:{:08b} Cycle:{:04}",
                 self.state.reg.pc(),
                 self.state.reg.get16(Reg16::AF),
                 self.state.reg.get16(Reg16::BC),
@@ -106,14 +109,15 @@ impl Cpu {
                 self.state.reg.get16(Reg16::SP),
                 self.state.reg.get16(Reg16::IX),
                 self.state.reg.get16(Reg16::IY),
-                self.state.reg.get8(Reg8::F)
+                self.state.reg.get8(Reg8::F),
+                self.state.cycle
             );
             println!(" [{:02x} {:02x} {:02x}]", sys.peek(pc),
                 sys.peek(pc.wrapping_add(1)), sys.peek(pc.wrapping_add(2)));
         }
     }
 
-    /// Returns the instrction in PC disassembled. PC is advanced.
+    /// Returns the instruction in PC disassembled. PC is advanced.
     /// 
     /// # Arguments
     /// 
@@ -158,6 +162,11 @@ impl Cpu {
     /// Signal reset
     pub fn signal_reset(&mut self) {
         self.state.reset_pending = true
+    }
+
+    /// Returns the current cycle count
+    pub fn cycle_count(&self) -> u64 {
+        self.state.cycle
     }
 }
 
