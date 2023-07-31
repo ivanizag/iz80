@@ -253,6 +253,7 @@ pub fn build_ld_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
 
             if repeat && bc != 0 {
                 // Back to redo the instruction
+                env.set_branch_taken();
                 let pc = env.state.reg.pc().wrapping_sub(2);
                 env.state.reg.set_pc(pc);
             }
