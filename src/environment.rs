@@ -89,6 +89,11 @@ impl <'a> Environment<'_> {
         self.state.branch_taken = false;
     }
 
+    pub fn clear_int_just_enabled(&mut self) {
+        self.state.int_just_enabled = false;
+    }
+
+
     pub fn set_branch_taken(&mut self) {
         self.state.branch_taken = true;
     }

@@ -100,12 +100,21 @@ pub fn build_push_rr(rr: Reg16) -> Opcode {
     )
 }
 
-pub fn build_conf_interrupts(enable: bool) -> Opcode {
-    let name = if enable {"EI"} else  {"DI"};
+pub fn build_disable_interrupts() -> Opcode {
     Opcode::new(
-        name.to_string(),
+        "DI".to_string(),
         Box::new(move |env: &mut Environment| {
-            env.state.reg.set_interrupts(enable);
+            env.state.reg.set_interrupts(false);
+        })
+    )
+}
+
+pub fn build_enable_interrupts() -> Opcode {
+    Opcode::new(
+        "EI".to_string(),
+        Box::new(move |env: &mut Environment| {
+            env.state.reg.set_interrupts(true);
+            env.state.int_just_enabled = true;
         })
     )
 }

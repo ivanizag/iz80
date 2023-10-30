@@ -116,9 +116,18 @@ impl Registers {
             mode8080: false
         };
 
-        reg.set16(Reg16::AF, 0xffff);
-        reg.set16(Reg16::SP, 0xffff);
+        reg.reset();
         reg
+    }
+
+    pub(crate) fn reset(&mut self) {
+        self.set8(Reg8::I, 0x00);
+        self.set8(Reg8::R, 0x00);
+        self.set_interrupts(false);
+        self.set_interrupt_mode(0);
+        self.set16(Reg16::AF, 0xffff);
+        self.set16(Reg16::SP, 0xffff);
+        self.set_pc(0x0000);
     }
 
     pub(crate) fn set_8080(&mut self) {
@@ -356,6 +365,10 @@ impl Registers {
         }
     }
 
+    pub(crate) fn update_p_flag_with_iff2(&mut self) {
+        self.put_flag(Flag::P, self.iff2)
+    }
+
     /// Returns the program counter
     #[inline]
     pub fn pc(&self) -> u16 {
@@ -375,6 +388,10 @@ impl Registers {
 
     pub(crate) fn set_interrupt_mode(&mut self, im: u8) {
         self.im = im;
+    }
+
+    pub(crate) fn get_interrupt_mode(&self) -> (bool, u8) {
+        (self.iff1, self.im)
     }
 
     pub(crate) fn start_nmi(&mut self) {

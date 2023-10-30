@@ -60,6 +60,10 @@ pub fn build_ld_r_r(dst: Reg8, src: Reg8, _special: bool) -> Opcode {
             Box::new(move |env: &mut Environment| {
                 let value = env.state.reg.get8(src);
                 env.state.reg.set8(dst, value);
+                if dst == Reg8::A && (src == Reg8::I || src == Reg8::R) {
+                    // LDA A,I and LDA A,R copy the IFF2 flag into the P flag
+                    env.state.reg.update_p_flag_with_iff2();
+                }
             })
         )
     } else {
