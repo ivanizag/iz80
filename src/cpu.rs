@@ -75,7 +75,6 @@ impl Cpu {
         if env.state.reset_pending {
             env.state.reset_pending = false;
             env.state.nmi_pending = false;
-            env.state.int_pending = false;
             env.state.halted = false;
             env.state.reg.reset();
             env.state.cycle = env.state.cycle.wrapping_add(3);
@@ -86,10 +85,9 @@ impl Cpu {
             env.state.reg.start_nmi();
             env.state.cycle = env.state.cycle.wrapping_add(11);
             env.subroutine_call(NMI_ADDRESS);
-        } else if env.state.int_pending {
+        } else if env.state.int_signaled {
             let (int_enabled, int_mode) = env.state.reg.get_interrupt_mode();
             if int_enabled && !env.state.int_just_enabled {
-                env.state.int_pending = false;
                 env.state.halted = false;
                 env.state.reg.set_interrupts(false);
                 match int_mode {
@@ -171,12 +169,13 @@ impl Cpu {
         self.state.halted
             && !self.state.nmi_pending
             && !self.state.reset_pending
-            && !self.state.int_pending
+            && !self.state.int_signaled
     }
 
-    /// Maskable interrupt request
-    pub fn signal_interrupt(&mut self) {
-        self.state.int_pending = true
+    /// Maskable interrupt request. It stays signaled until is is
+    /// deactivated by calling signal_interrupt(false).
+    pub fn signal_interrupt(&mut self, active: bool) {
+        self.state.int_signaled = active
     }
 
     /// Non maskable interrupt request

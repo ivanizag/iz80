@@ -13,7 +13,7 @@ pub struct State {
     /// Halt state of the CPU
     pub halted: bool,
     /// Maskable interrupt signaled
-    pub int_pending: bool,
+    pub int_signaled: bool,
     /// Non maskable interrupt signaled
     pub nmi_pending: bool,
     /// Reset signaled
@@ -33,7 +33,7 @@ impl State {
             cycle: 0,
             branch_taken: false,
             halted: false,
-            int_pending: false,
+            int_signaled: false,
             nmi_pending: false,
             reset_pending: false,
             int_just_enabled: false,
