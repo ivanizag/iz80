@@ -413,20 +413,20 @@ impl DecoderZ80 {
 
         // Load cycle information
         for c in 0..=255 {
-            if let Some(opcode) = &mut self.no_prefix[c as usize] {
+            if let Some(opcode) = &mut self.no_prefix[c] {
                 opcode.cycles = NO_PREFIX_CYCLES[c];
                 opcode.cycles_conditional = opcode.cycles;
             }
-            if let Some(opcode) = &mut self.prefix_cb[c as usize] {
+            if let Some(opcode) = &mut self.prefix_cb[c] {
                 opcode.cycles = PREFIX_CB_CYCLES[c];
                 opcode.cycles_conditional = opcode.cycles;
             }
-            if let Some(opcode) = &mut self.prefix_cb_indexed[c as usize] {
+            if let Some(opcode) = &mut self.prefix_cb_indexed[c] {
                 // 23 cycles except for BIT that is 20
                 opcode.cycles = if (c & 0xc0) == 0x40 {20} else {23};
                 opcode.cycles_conditional = opcode.cycles;
             }
-            if let Some(opcode) = &mut self.prefix_ed[c as usize] {
+            if let Some(opcode) = &mut self.prefix_ed[c] {
                 opcode.cycles = PREFIX_ED_CYCLES[c];
                 opcode.cycles_conditional = opcode.cycles;
             }

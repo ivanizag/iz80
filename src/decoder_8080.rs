@@ -163,7 +163,7 @@ impl Decoder8080 {
 
         // Load cycle information
         for c in 0..=255 {
-            if let Some(opcode) = &mut self.no_prefix[c as usize] {
+            if let Some(opcode) = &mut self.no_prefix[c] {
                 opcode.cycles = NO_PREFIX_CYCLES[c];
                 opcode.cycles_conditional = opcode.cycles;
             }
