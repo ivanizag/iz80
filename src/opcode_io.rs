@@ -103,8 +103,7 @@ pub fn build_in_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
             env.state.reg.inc_dec16(Reg16::HL, inc);
 
             // TUZD-4.3
-            let mut j = env.state.reg.get8(Reg8::C) as u16;
-            j = if inc {j+1} else {j-1};
+            let j = (env.state.reg.get8(Reg8::C) as u16).wrapping_add(if inc { 1 } else { 0xFFFF });
             let k = value as u16 + (j & 0xff);
             env.state.reg.update_block_flags(value, k, b);
 
