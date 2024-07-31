@@ -27,7 +27,7 @@ impl Default for TimedRunner {
 }
 
 impl TimedRunner {
-        /// Define a new CPU speed in MHz
+    /// Define a new CPU speed in `MHz`
     pub fn set_mhz(&mut self, cpu: &Cpu, mhz: f64, quantum_cycles: u64) {
         self.mhz = mhz;
         self.quantum_cycles = quantum_cycles;

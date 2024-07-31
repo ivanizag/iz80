@@ -3,12 +3,12 @@ use iz80::*;
 // From https://github.com/raxoft/z80test
 // Not passing
 
-//static CODE: &'static [u8] = include_bytes!("res/z80doc.out");
-//static CODE: &'static [u8] = include_bytes!("res/z80ccf.out");
-//static CODE: &'static [u8] = include_bytes!("res/z80docflags.out");
-//static CODE: &'static [u8] = include_bytes!("res/z80flags.out");
-//static CODE: &'static [u8] = include_bytes!("res/z80memptr.out");
-static CODE: &'static [u8] = include_bytes!("res/z80full.out");
+//static CODE: &[u8] = include_bytes!("res/z80doc.out");
+//static CODE: &[u8] = include_bytes!("res/z80ccf.out");
+//static CODE: &[u8] = include_bytes!("res/z80docflags.out");
+//static CODE: &[u8] = include_bytes!("res/z80flags.out");
+//static CODE: &[u8] = include_bytes!("res/z80memptr.out");
+static CODE: &[u8] = include_bytes!("res/z80full.out");
 
 const START: u16 = 0x8000;
 
@@ -35,9 +35,9 @@ fn z80test() {
     if run_single_test {
         machine.poke16(0x802b, single_test); // ld bc, 0 to ld bc, test
         let mut test_start = machine.peek16(0x802e);
-        println!("Test table {:x}", test_start);
+        println!("Test table {test_start:x}");
         test_start += single_test*2;
-        println!("Test table {:x}", test_start);
+        println!("Test table {test_start:x}");
         machine.poke16(0x802e, test_start); // Move start
         machine.poke16(test_start + 2 , 0); // NUL terminate test
     }
@@ -50,24 +50,24 @@ fn z80test() {
         cpu.execute_instruction(&mut machine);
 
         if cpu.registers().pc() == 0x0000 {
-            println!("");
+            println!();
             break;
         }
 
         if cpu.registers().pc() == 0x0010 {
             let mut ch = cpu.registers().get8(Reg8::A) as char;
             if ch == '\r' {
-                ch = '\n'
+                ch = '\n';
             } else if ch as u8 == 23 {
-                ch = ' '
+                ch = ' ';
             } else if ch as u8 == 26 {
-                ch = ' '
+                ch = ' ';
             } 
             //print!("{}[{}]", ch, ch as u8);
-            print!("{}", ch);
+            print!("{ch}");
             msg.push(ch);
         }
     }
 
-    assert_eq!(true, msg.contains("CPU TESTS OK"));
+    assert!(msg.contains("CPU TESTS OK"));
 }

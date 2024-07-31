@@ -2,7 +2,7 @@ use iz80::*;
 
 // Diagnostics II, version 1.2, CPU test by Supersoft Associates
 
-static CODE: &'static [u8] = include_bytes!("res/CPUTEST.COM");
+static CODE: &[u8] = include_bytes!("res/CPUTEST.COM");
 
 #[test]
 fn test_cpu_test_8080() {
@@ -51,7 +51,7 @@ fn cpu_test(mut cpu: Cpu) {
         }
 
         if cpu.registers().pc() == 0x0000 {
-            println!("");
+            println!();
             break;
         }
 
@@ -60,7 +60,7 @@ fn cpu_test(mut cpu: Cpu) {
                 2 => {
                     // C_WRITE
                     let ch = cpu.registers().get8(Reg8::E) as char;
-                    print!("{}", ch);
+                    print!("{ch}");
                     msg.push(ch);
                 },
                 _ => panic!("BDOS command not implemented")
@@ -68,5 +68,5 @@ fn cpu_test(mut cpu: Cpu) {
         }
     }
 
-    assert_eq!(true, msg.contains("CPU TESTS OK"));
+    assert!(msg.contains("CPU TESTS OK"));
 }

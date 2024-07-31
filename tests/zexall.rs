@@ -1,7 +1,7 @@
 use iz80::*;
 
-//static ZEXDOC: &'static [u8] = include_bytes!("res/zexdoc.com");
-static ZEXALL: &'static [u8] = include_bytes!("res/zexall.com");
+//static ZEXDOC: &[u8] = include_bytes!("res/zexdoc.com");
+static ZEXALL: &[u8] = include_bytes!("res/zexall.com");
 
 #[test]
 #[ignore]
@@ -49,16 +49,16 @@ fn test_zexall() {
 
         if trace {
             // Test state
-            let addr = 0x1d80 as u16;
-            print!("Zex state 0x{:04x}: ", addr);
+            let addr = 0x1d80_u16;
+            print!("Zex state 0x{addr:04x}: ");
             for i in 0..0x10 {
                 print!("{:02x} ", machine.peek(addr + i));
             }
-            println!("");
+            println!();
         }
 
         if cpu.registers().pc() == 0x0000 {
-            println!("");
+            println!();
             break;
         }
 
@@ -84,7 +84,7 @@ fn test_zexall() {
                     if msg.contains("OK") {
                         tests_passed += 1;
                     }
-                    print!("{}", msg);
+                    print!("{msg}");
                 },
                 _ => panic!("BDOS command not implemented")
             }

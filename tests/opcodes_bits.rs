@@ -6,13 +6,13 @@ fn test_rrca_fast() {
     let mut cpu = Cpu::new();
 
     sys.poke(0x0000, 0x0f); // RRCA
-    cpu.registers().set_a(0b10010011);
+    cpu.registers().set_a(0b1001_0011);
     cpu.registers().set_flag(Flag::C);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b11001001, cpu.registers().a());
-    assert_eq!(true, cpu.registers().get_flag(Flag::C));
+    assert_eq!(0b1100_1001, cpu.registers().a());
+    assert!(cpu.registers().get_flag(Flag::C));
 }
 
 #[test]
@@ -22,13 +22,13 @@ fn test_rrc_a() {
 
     sys.poke(0x0000, 0xcb); // RRC A
     sys.poke(0x0001, 0x0f);
-    cpu.registers().set_a(0b10010011);
+    cpu.registers().set_a(0b1001_0011);
     cpu.registers().set_flag(Flag::C);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b11001001, cpu.registers().a());
-    assert_eq!(true, cpu.registers().get_flag(Flag::C));
+    assert_eq!(0b1100_1001, cpu.registers().a());
+    assert!(cpu.registers().get_flag(Flag::C));
 }
 
 #[test]
@@ -38,13 +38,13 @@ fn test_rr_b() {
 
     sys.poke(0x0000, 0xcb); // RR B
     sys.poke(0x0001, 0x18);
-    cpu.registers().set8(Reg8::B, 0b10010010);
+    cpu.registers().set8(Reg8::B, 0b1001_0010);
     cpu.registers().set_flag(Flag::C);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b11001001, cpu.registers().get8(Reg8::B));
-    assert_eq!(false, cpu.registers().get_flag(Flag::C));
+    assert_eq!(0b1100_1001, cpu.registers().get8(Reg8::B));
+    assert!(!cpu.registers().get_flag(Flag::C));
 }
 
 #[test]
@@ -54,13 +54,13 @@ fn test_sra_c() {
 
     sys.poke(0x0000, 0xcb); // SRA C
     sys.poke(0x0001, 0x29);
-    cpu.registers().set8(Reg8::C, 0b10010011);
+    cpu.registers().set8(Reg8::C, 0b1001_0011);
     cpu.registers().clear_flag(Flag::C);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b11001001, cpu.registers().get8(Reg8::C));
-    assert_eq!(true, cpu.registers().get_flag(Flag::C));
+    assert_eq!(0b1100_1001, cpu.registers().get8(Reg8::C));
+    assert!(cpu.registers().get_flag(Flag::C));
 }
 
 #[test]
@@ -70,13 +70,13 @@ fn test_srl_d() {
 
     sys.poke(0x0000, 0xcb); // SRL D
     sys.poke(0x0001, 0x3a);
-    cpu.registers().set8(Reg8::D, 0b10010011);
+    cpu.registers().set8(Reg8::D, 0b1001_0011);
     cpu.registers().clear_flag(Flag::C);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b01001001, cpu.registers().get8(Reg8::D));
-    assert_eq!(true, cpu.registers().get_flag(Flag::C));
+    assert_eq!(0b0100_1001, cpu.registers().get8(Reg8::D));
+    assert!(cpu.registers().get_flag(Flag::C));
 }
 
 #[test]
@@ -86,13 +86,13 @@ fn test_rlc_a() {
 
     sys.poke(0x0000, 0xcb); // RLC A
     sys.poke(0x0001, 0x07);
-    cpu.registers().set_a(0b00010011);
+    cpu.registers().set_a(0b0001_0011);
     cpu.registers().set_flag(Flag::C);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b00100110, cpu.registers().a());
-    assert_eq!(false, cpu.registers().get_flag(Flag::C));
+    assert_eq!(0b0010_0110, cpu.registers().a());
+    assert!(!cpu.registers().get_flag(Flag::C));
 }
 
 #[test]
@@ -102,13 +102,13 @@ fn test_rl_b() {
 
     sys.poke(0x0000, 0xcb); // RL B
     sys.poke(0x0001, 0x10);
-    cpu.registers().set8(Reg8::B, 0b00010011);
+    cpu.registers().set8(Reg8::B, 0b0001_0011);
     cpu.registers().set_flag(Flag::C);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b00100111, cpu.registers().get8(Reg8::B));
-    assert_eq!(false, cpu.registers().get_flag(Flag::C));
+    assert_eq!(0b0010_0111, cpu.registers().get8(Reg8::B));
+    assert!(!cpu.registers().get_flag(Flag::C));
 }
 
 #[test]
@@ -118,13 +118,13 @@ fn test_sla_c() {
 
     sys.poke(0x0000, 0xcb); // SLA C
     sys.poke(0x0001, 0x21);
-    cpu.registers().set8(Reg8::C, 0b10010011);
+    cpu.registers().set8(Reg8::C, 0b1001_0011);
     cpu.registers().clear_flag(Flag::C);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b00100110, cpu.registers().get8(Reg8::C));
-    assert_eq!(true, cpu.registers().get_flag(Flag::C));
+    assert_eq!(0b0010_0110, cpu.registers().get8(Reg8::C));
+    assert!(cpu.registers().get_flag(Flag::C));
 }
 
 #[test]
@@ -134,13 +134,13 @@ fn test_sll_d() {
 
     sys.poke(0x0000, 0xcb); // SLL D
     sys.poke(0x0001, 0x32);
-    cpu.registers().set8(Reg8::D, 0b10010011);
+    cpu.registers().set8(Reg8::D, 0b1001_0011);
     cpu.registers().clear_flag(Flag::C);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b00100111, cpu.registers().get8(Reg8::D));
-    assert_eq!(true, cpu.registers().get_flag(Flag::C));
+    assert_eq!(0b0010_0111, cpu.registers().get8(Reg8::D));
+    assert!(cpu.registers().get_flag(Flag::C));
 }
 
 #[test]
@@ -150,13 +150,13 @@ fn test_bit_a() {
 
     sys.poke(0x0000, 0xcb); // BIT 1, A
     sys.poke(0x0001, 0x4f);
-    cpu.registers().set_a(0b00010010);
+    cpu.registers().set_a(0b0001_0010);
     cpu.registers().set_flag(Flag::Z);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b00010010, cpu.registers().a());
-    assert_eq!(false, cpu.registers().get_flag(Flag::Z));
+    assert_eq!(0b0001_0010, cpu.registers().a());
+    assert!(!cpu.registers().get_flag(Flag::Z));
 }
 
 #[test]
@@ -166,13 +166,13 @@ fn test_set_b() {
 
     sys.poke(0x0000, 0xcb); // SET 0, B
     sys.poke(0x0001, 0xc0);
-    cpu.registers().set8(Reg8::B, 0b00010010);
+    cpu.registers().set8(Reg8::B, 0b0001_0010);
     cpu.registers().clear_flag(Flag::Z);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b00010011, cpu.registers().get8(Reg8::B));
-    assert_eq!(false, cpu.registers().get_flag(Flag::Z));
+    assert_eq!(0b0001_0011, cpu.registers().get8(Reg8::B));
+    assert!(!cpu.registers().get_flag(Flag::Z));
 }
 
 #[test]
@@ -182,13 +182,13 @@ fn test_res_c() {
 
     sys.poke(0x0000, 0xcb); // RES 7, C
     sys.poke(0x0001, 0xb9);
-    cpu.registers().set8(Reg8::C, 0b10010011);
+    cpu.registers().set8(Reg8::C, 0b1001_0011);
     cpu.registers().clear_flag(Flag::Z);
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(0b00010011, cpu.registers().get8(Reg8::C));
-    assert_eq!(false, cpu.registers().get_flag(Flag::Z));
+    assert_eq!(0b0001_0011, cpu.registers().get8(Reg8::C));
+    assert!(!cpu.registers().get_flag(Flag::Z));
 }
 
 #[test]

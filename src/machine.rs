@@ -2,7 +2,7 @@
 /// 
 /// The device hosting the CPU has to provide implementations
 /// of the memory and port access. A simple implementation is
-/// provided with PlainMachine
+/// provided with `PlainMachine`
 pub trait Machine {
     /// Returns the memory contents in [address]
     fn peek(&self, address: u16) -> u8;
@@ -40,7 +40,7 @@ pub struct PlainMachine {
 }
 
 impl PlainMachine {
-    /// Returns a new PlainMachine instance
+    /// Returns a new `PlainMachine` instance
     pub fn new() -> PlainMachine {
         PlainMachine {
             mem: [0; 65536],

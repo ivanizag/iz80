@@ -1,6 +1,6 @@
-use super::opcode::*;
-use super::environment::*;
-use super::registers::*;
+use super::opcode::Opcode;
+use super::environment::Environment;
+use super::registers::{Flag, Reg8};
 
 #[derive(Copy, Clone)]
 pub enum ShiftMode {
@@ -18,10 +18,10 @@ pub enum ShiftDir {
 
 pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast: bool, indexed: bool) -> Opcode {
     let full_name = if indexed {
-        format!("LD {}, {} {}", r, name, Reg8::_HL)
+        format!("LD {r}, {name} {}", Reg8::_HL)
     } else {
         let separator = if fast {""} else {" "};
-        format!("{}{}{}", name, separator, r)
+        format!("{name}{separator}{r}")
     };
 
     Opcode::new(
@@ -82,7 +82,7 @@ pub fn build_rot_r(r: Reg8, (dir, mode, name): (ShiftDir, ShiftMode, &str), fast
 
 pub fn build_bit_r(n: u8, r: Reg8) -> Opcode {
     Opcode::new(
-        format!("BIT {}, {}", n, r),
+        format!("BIT {n}, {r}"),
         move |env: &mut Environment| {
             let v = env.reg8_ext(r);
             let z = v & (1<<n);
@@ -120,7 +120,7 @@ pub fn build_bit_r(n: u8, r: Reg8) -> Opcode {
 pub fn build_set_res_r(bit: u8, r: Reg8, value: bool) -> Opcode {
     let name = if value {"SET"} else {"RES"};
     Opcode::new(
-        format!("{} {}, {}", name, bit, r),
+        format!("{name} {bit}, {r}"),
         move |env: &mut Environment| {
             let mut v = env.reg8_ext(r);
             if value {

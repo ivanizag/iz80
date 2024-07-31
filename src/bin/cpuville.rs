@@ -3,7 +3,7 @@
 http://cpuville.com/Code/CPM-on-a-new-computer.html
 http://cpuville.com/Code/Tiny-BASIC.html
 */
-use std::io::*;
+use std::io::{BufRead, Read, Write, stdin, stdout};
 use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
 use std::sync::mpsc::TryRecvError;

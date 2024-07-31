@@ -1,12 +1,12 @@
-use super::opcode::*;
-use super::environment::*;
+use super::opcode::Opcode;
+use super::environment::Environment;
 use super::operators::*;
-use super::registers::*;
+use super::registers::{Flag, Reg16, Reg8};
 
 // 16 bit ADD opcodes
 pub fn build_add_hl_rr(rr: Reg16) -> Opcode {
     Opcode::new(
-        format!("ADD HL, {:?}", rr),
+        format!("ADD HL, {rr:?}"),
         move |env: &mut Environment| {
             let aa = env.index_value();
             let bb = env.reg16_ext(rr);
@@ -18,7 +18,7 @@ pub fn build_add_hl_rr(rr: Reg16) -> Opcode {
 
 pub fn build_adc_hl_rr(rr: Reg16) -> Opcode {
     Opcode::new(
-        format!("ADC HL, {:?}", rr),
+        format!("ADC HL, {rr:?}"),
         move |env: &mut Environment| {
             let aa = env.index_value(); // This will always be HL.
             let bb = env.reg16_ext(rr);
@@ -30,7 +30,7 @@ pub fn build_adc_hl_rr(rr: Reg16) -> Opcode {
 
 pub fn build_sbc_hl_rr(rr: Reg16) -> Opcode {
     Opcode::new(
-        format!("SBC HL, {:?}", rr),
+        format!("SBC HL, {rr:?}"),
         move |env: &mut Environment| {
             let aa = env.index_value(); // This will always be HL.
             let bb = env.reg16_ext(rr);
@@ -44,7 +44,7 @@ pub fn build_sbc_hl_rr(rr: Reg16) -> Opcode {
 // INC, DEC opcodes
 pub fn build_inc_r(r: Reg8) -> Opcode {
     Opcode::new(
-        format!("INC {}", r),
+        format!("INC {r}"),
         move |env: &mut Environment| {
             let a = env.reg8_ext(r);
             let v = operator_inc(env, a);
@@ -55,7 +55,7 @@ pub fn build_inc_r(r: Reg8) -> Opcode {
 
 pub fn build_dec_r(r: Reg8) -> Opcode {
     Opcode::new(
-        format!("DEC {}", r),
+        format!("DEC {r}"),
         move |env: &mut Environment| {
             let a = env.reg8_ext(r);
             let v = operator_dec(env, a);
@@ -68,7 +68,7 @@ pub fn build_inc_dec_rr(rr: Reg16, inc: bool) -> Opcode {
     let delta = if inc {1} else {-1_i16 as u16};
     let mnemonic = if inc {"INC"} else {"DEC"};
     Opcode::new(
-        format!("{} {:?}", mnemonic, rr),
+        format!("{mnemonic} {rr:?}"),
         move |env: &mut Environment| {
             let mut v = env.reg16_ext(rr);
             v = v.wrapping_add(delta);

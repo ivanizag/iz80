@@ -33,11 +33,11 @@ impl Decoder for DecoderZ80 {
             if code == 0xdd {
                 // DD prefix
                 env.set_index(Reg16::IX);
-                code = env.advance_pc()
+                code = env.advance_pc();
             } else {
                 // FD prefix
                 env.set_index(Reg16::IY);
-                code = env.advance_pc()
+                code = env.advance_pc();
             }
         }
         

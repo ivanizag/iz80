@@ -152,18 +152,14 @@ impl Registers {
     /// Returns the value of an 8 bit register
     #[inline]
     pub fn get8(&self, reg: Reg8) -> u8 {
-        if reg == Reg8::_HL {
-            panic!("Can't use the pseudo register (HL)");
-        }
+        assert!(!(reg == Reg8::_HL), "Can't use the pseudo register (HL)");
         self.data[reg as usize]
     }
 
     /// Sets the value of an 8 bit register
     #[inline]
     pub fn set8(&mut self, reg: Reg8, value: u8) {
-        if reg == Reg8::_HL {
-            panic!("Can't use the pseudo register (HL)");
-        }
+        assert!(!(reg == Reg8::_HL), "Can't use the pseudo register (HL)");
         self.data[reg as usize] = value;
     }
 
@@ -367,7 +363,7 @@ impl Registers {
     }
 
     pub(crate) fn update_p_flag_with_iff2(&mut self) {
-        self.put_flag(Flag::P, self.iff2)
+        self.put_flag(Flag::P, self.iff2);
     }
 
     /// Returns the program counter
@@ -434,12 +430,12 @@ mod tests {
         let mut r = Registers::new();
  
         r.set_flag(Flag::P);
-        assert_eq!(true, r.get_flag(Flag::P));
+        assert!(r.get_flag(Flag::P));
         r.clear_flag(Flag::P);
-        assert_eq!(false, r.get_flag(Flag::P));
+        assert!(!r.get_flag(Flag::P));
         r.put_flag(Flag::P, true);
-        assert_eq!(true, r.get_flag(Flag::P));
+        assert!(r.get_flag(Flag::P));
         r.put_flag(Flag::P, false);
-        assert_eq!(false, r.get_flag(Flag::P));
+        assert!(!r.get_flag(Flag::P));
     }
 }

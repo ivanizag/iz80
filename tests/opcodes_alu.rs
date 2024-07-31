@@ -12,7 +12,7 @@ fn test_cp_a() {
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(false, cpu.registers().get_flag(Flag::H));
+    assert!(!cpu.registers().get_flag(Flag::H));
 }
 
 #[test]
@@ -27,5 +27,5 @@ fn test_cp_a_2() {
 
     cpu.execute_instruction(&mut sys);
 
-    assert_eq!(true, cpu.registers().get_flag(Flag::H));
+    assert!(cpu.registers().get_flag(Flag::H));
 }

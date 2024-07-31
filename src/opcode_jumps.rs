@@ -1,6 +1,6 @@
-use super::opcode::*;
-use super::environment::*;
-use super::registers::*;
+use super::opcode::Opcode;
+use super::environment::Environment;
+use super::registers::{Flag, Reg8};
 
 // Relative jumps
 pub fn build_djnz() -> Opcode {
@@ -31,7 +31,7 @@ pub fn build_jr_unconditional() -> Opcode {
 
 pub fn build_jr_eq((flag, value, name): (Flag, bool, &str)) -> Opcode {
     Opcode::new(
-        format!("JR {}, d", name),
+        format!("JR {name}, d"),
         move |env: &mut Environment| {
             let offset = env.advance_pc();
             if env.state.reg.get_flag(flag) == value {
@@ -62,7 +62,7 @@ pub fn build_jp_unconditional() -> Opcode {
 
 pub fn build_jp_eq((flag, value, name): (Flag, bool, &str)) -> Opcode {
     Opcode::new(
-        format!("JP {}, nn", name),
+        format!("JP {name}, nn"),
         move |env: &mut Environment| {
             let address = env.advance_immediate16();
             if env.state.reg.get_flag(flag) == value {
@@ -97,7 +97,7 @@ pub fn build_call() -> Opcode {
 
 pub fn build_call_eq((flag, value, name): (Flag, bool, &str)) -> Opcode {
     Opcode::new(
-        format!("CALL {}, nn", name),
+        format!("CALL {name}, nn"),
         move |env: &mut Environment| {
             let address = env.advance_immediate16();
             if env.state.reg.get_flag(flag) == value {
@@ -110,7 +110,7 @@ pub fn build_call_eq((flag, value, name): (Flag, bool, &str)) -> Opcode {
 
 pub fn build_rst(d: u8) -> Opcode {
     Opcode::new(
-        format!("RST {:02x}h", d),
+        format!("RST {d:02x}h"),
         move |env: &mut Environment| {
             let address = d as u16;
             env.subroutine_call(address);
@@ -150,7 +150,7 @@ pub fn build_retn() -> Opcode {
 
 pub fn build_ret_eq((flag, value, name): (Flag, bool, &str)) -> Opcode {
     Opcode::new(
-        format!("RET {}", name),
+        format!("RET {name}"),
         move |env: &mut Environment| {
             if env.state.reg.get_flag(flag) == value {
                 env.set_branch_taken();

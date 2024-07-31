@@ -1,4 +1,4 @@
-use iz80::*;
+use iz80::{Cpu, Machine, PlainMachine};
 
 fn main() {
     // Prepare the device

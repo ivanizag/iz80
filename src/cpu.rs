@@ -1,10 +1,10 @@
-use super::decoder_z80::*;
-use super::decoder_8080::*;
-use super::environment::*;
-use super::machine::*;
-use super::opcode::*;
-use super::registers::*;
-use super::state::*;
+use super::decoder_z80::DecoderZ80;
+use super::decoder_8080::Decoder8080;
+use super::environment::Environment;
+use super::machine::Machine;
+use super::opcode::Opcode;
+use super::registers::{Reg16, Reg8, Registers};
+use super::state::State;
 
 const IRQ_ADDRESS: u16 = 0x0036;
 const NMI_ADDRESS: u16 = 0x0066;
@@ -24,7 +24,7 @@ pub(crate) trait Decoder {
 
 impl Cpu {
 
-    /// Returns a Z80 Cpu instance. Alias of new_z80()
+    /// Returns a Z80 Cpu instance. Alias of `new_z80()`
     pub fn new() -> Cpu {
         Self::new_z80()
     }
@@ -173,19 +173,19 @@ impl Cpu {
     }
 
     /// Maskable interrupt request. It stays signaled until is is
-    /// deactivated by calling signal_interrupt(false).
+    /// deactivated by calling `signal_interrupt(false)`.
     pub fn signal_interrupt(&mut self, active: bool) {
-        self.state.int_signaled = active
+        self.state.int_signaled = active;
     }
 
     /// Non maskable interrupt request
     pub fn signal_nmi(&mut self) {
-        self.state.nmi_pending = true
+        self.state.nmi_pending = true;
     }
 
     /// Signal reset
     pub fn signal_reset(&mut self) {
-        self.state.reset_pending = true
+        self.state.reset_pending = true;
     }
 
     /// Returns the current cycle count

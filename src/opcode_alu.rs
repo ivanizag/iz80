@@ -1,13 +1,13 @@
-use super::opcode::*;
-use super::environment::*;
-use super::registers::*;
-use super::operators::*;
+use super::opcode::Opcode;
+use super::environment::Environment;
+use super::registers::{Flag, Reg16, Reg8};
+use super::operators::{Operator, operator_cp};
 
 pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
     if r != Reg8::_HL && r != Reg8::H && r != Reg8::L {
         // Fast version
         Opcode::new(
-            format!("{} A, {}", name, r),
+            format!("{name} A, {r}"),
             move |env: &mut Environment| {
                 let a = env.state.reg.a();
                 let b = env.state.reg.get8(r);
@@ -17,7 +17,7 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
         )
     } else {
         Opcode::new(
-            format!("{} A, {}", name, r),
+            format!("{name} A, {r}"),
             move |env: &mut Environment| {
                 let a = env.state.reg.a();
                 let b = env.reg8_ext(r);
@@ -31,7 +31,7 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
 
 pub fn build_operator_a_n((op, name): (Operator, &str)) -> Opcode {
     Opcode::new(
-        format!("{} A, n", name),
+        format!("{name} A, n"),
         move |env: &mut Environment| {
             let a = env.state.reg.a();
             let b = env.advance_pc();
@@ -44,7 +44,7 @@ pub fn build_operator_a_n((op, name): (Operator, &str)) -> Opcode {
 
 pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Opcode {
     Opcode::new(
-        format!("CP{}", postfix),
+        format!("CP{postfix}"),
         move |env: &mut Environment| {
             let a = env.state.reg.a();
             let b = env.reg8_ext(Reg8::_HL);

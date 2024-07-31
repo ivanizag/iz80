@@ -1,5 +1,5 @@
-use super::environment::*;
-use super::registers::*;
+use super::environment::Environment;
+use super::registers::Reg16;
 
 type OpcodeFn = dyn Fn(&mut Environment);
 
@@ -35,18 +35,18 @@ impl Opcode {
         if self.name.contains("nn") {
             // Immediate argument 16 bits
             let nn = env.peek16_pc();
-            let nn_str = format!("{:04x}h", nn);
+            let nn_str = format!("{nn:04x}h");
             name.replace("nn", &nn_str)
         } else if self.name.contains('n') {
             // Immediate argument 8 bits
             let n = env.peek_pc();
-            let n_str = format!("{:02x}h", n);
+            let n_str = format!("{n:02x}h");
             name.replace('n', &n_str)
         } else if self.name.contains('d') {
             // Immediate argument 8 bits signed
             // In assembly it's shown with 2 added as if it were from the opcode pc.
             let d = env.peek_pc() as i8 as i16 + 2;
-            let d_str = format!("{:+x}", d);
+            let d_str = format!("{d:+x}");
             name.replace('d', &d_str)
         } else {
             name

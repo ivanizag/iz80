@@ -1,4 +1,4 @@
-use super::registers::*;
+use super::registers::{Reg16, Registers};
 
 /// Internal state of the CPU
 /// 

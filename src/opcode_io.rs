@@ -1,6 +1,6 @@
-use super::opcode::*;
-use super::environment::*;
-use super::registers::*;
+use super::opcode::Opcode;
+use super::environment::Environment;
+use super::registers::{Reg16, Reg8};
 
 /*
     From "The undocumented Z80 documented" TUZD-4.4:
@@ -17,7 +17,7 @@ instructions before.
 
 pub fn build_out_c_r(r: Reg8) -> Opcode {
     Opcode::new(
-        format!("OUT (C), {}", r),
+        format!("OUT (C), {r}"),
         move |env: &mut Environment| {
             let address = env.state.reg.get16(Reg16::BC);
             let value = env.state.reg.get8(r);
@@ -49,7 +49,7 @@ pub fn build_out_n_a() -> Opcode {
 
 pub fn build_in_r_c(r: Reg8) -> Opcode {
     Opcode::new(
-        format!("IN {}, (C)", r),
+        format!("IN {r}, (C)"),
         move |env: &mut Environment| {
             let address = env.state.reg.get16(Reg16::BC);
             let value = env.port_in(address);
@@ -91,7 +91,7 @@ instructions before.
 
 pub fn build_in_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Opcode {
     Opcode::new(
-        format!("IN{}", postfix),
+        format!("IN{postfix}"),
         move |env: &mut Environment| {
             // The INI/INIR/IND/INDR instructions use BC after decrementing B
             let b = env.state.reg.inc_dec8(Reg8::B, false /* decrement */);
@@ -120,7 +120,7 @@ pub fn build_in_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
 pub fn build_out_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Opcode {
     let n0 = if repeat {"OT"} else {"OUT"};
     Opcode::new(
-        format!("{}{}", n0, postfix),
+        format!("{n0}{postfix}"),
         move |env: &mut Environment| {
             // the OUTI/OTIR/OUTD/OTDR instructions use BC before decrementing B
             let address = env.state.reg.get16(Reg16::BC);

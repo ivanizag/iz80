@@ -1,6 +1,6 @@
-use super::machine::*;
+use super::machine::Machine;
 use super::opcode::Opcode;
-use super::registers::*;
+use super::registers::{Reg16, Reg8};
 use super::state::State;
 
 pub struct Environment<'a> {

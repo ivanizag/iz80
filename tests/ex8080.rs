@@ -4,7 +4,7 @@ use iz80::*;
 8080/8085 CPU Exerciser by Ian Bartholomew and Frank Cringles
 */
 
-static CODE: &'static [u8] = include_bytes!("res/8080EX1.COM");
+static CODE: &[u8] = include_bytes!("res/8080EX1.COM");
 
 #[test]
 #[ignore]
@@ -51,16 +51,16 @@ fn test_ex8080() {
 
         if trace && false {
             // Test state
-            let addr = 0x1d80 as u16;
-            print!("Zex state 0x{:04x}: ", addr);
+            let addr = 0x1d80_u16;
+            print!("Zex state 0x{addr:04x}: ");
             for i in 0..0x10 {
                 print!("{:02x} ", machine.peek(addr + i));
             }
-            println!("");
+            println!();
         }
 
         if cpu.registers().pc() == 0x0000 {
-            println!("");
+            println!();
             break;
         }
 
@@ -86,7 +86,7 @@ fn test_ex8080() {
                     if msg.contains("OK") {
                         tests_passed += 1;
                     }
-                    print!("{}", msg);
+                    print!("{msg}");
                 },
                 _ => panic!("BDOS command not implemented")
             }

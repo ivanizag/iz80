@@ -1,5 +1,5 @@
-use super::environment::*;
-use super::registers::*;
+use super::environment::Environment;
+use super::registers::Flag;
 
 pub type Operator = fn(&mut Environment, u8, u8) -> u8;
 
