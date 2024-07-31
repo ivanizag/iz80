@@ -321,8 +321,9 @@ impl Registers {
                 let a_b3 = (a & 0x08) != 0;
                 let b_b3 = (b & 0x08) != 0;
                 let r_b3 = (reference & 0x08) != 0;
+                #[allow(clippy::nonminimal_bool)]
                 let neg_half_bit = (!a_b3 && !b_b3 && !r_b3) || (a_b3 && !(b_b3 && r_b3)); 
-                self.put_flag(Flag::H, neg_half_bit);    
+                self.put_flag(Flag::H, neg_half_bit);
             }
         } else {
             let top_xor = (xor & 0x80) != 0;

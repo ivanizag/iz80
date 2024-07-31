@@ -8,23 +8,23 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
         // Fast version
         Opcode::new(
             format!("{} A, {}", name, r),
-            Box::new(move |env: &mut Environment| {
+            move |env: &mut Environment| {
                 let a = env.state.reg.a();
                 let b = env.state.reg.get8(r);
                 let v = op(env, a, b);
                 env.state.reg.set_a(v);
-            })
+            }
         )
     } else {
         Opcode::new(
             format!("{} A, {}", name, r),
-            Box::new(move |env: &mut Environment| {
+            move |env: &mut Environment| {
                 let a = env.state.reg.a();
                 let b = env.reg8_ext(r);
                 let v = op(env, a, b);
 
                 env.state.reg.set_a(v);
-            })
+            }
         )
     }
 }
@@ -32,20 +32,20 @@ pub fn build_operator_a_r(r: Reg8, (op, name): (Operator, &str)) -> Opcode {
 pub fn build_operator_a_n((op, name): (Operator, &str)) -> Opcode {
     Opcode::new(
         format!("{} A, n", name),
-        Box::new(move |env: &mut Environment| {
+        move |env: &mut Environment| {
             let a = env.state.reg.a();
             let b = env.advance_pc();
             let v = op(env, a, b);
 
             env.state.reg.set_a(v);
-        })
+        }
     )
 }
 
 pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Opcode {
     Opcode::new(
         format!("CP{}", postfix),
-        Box::new(move |env: &mut Environment| {
+        move |env: &mut Environment| {
             let a = env.state.reg.a();
             let b = env.reg8_ext(Reg8::_HL);
             let c_bak = env.state.reg.get_flag(Flag::C);
@@ -70,6 +70,6 @@ pub fn build_cp_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
                 let pc = env.state.reg.pc().wrapping_sub(2);
                 env.state.reg.set_pc(pc);
             }
-        })
+        }
     )
 }

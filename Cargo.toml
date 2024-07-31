@@ -2,7 +2,7 @@
 name = "iz80"
 version = "0.4.1"
 authors = ["Ivan Izaguirre <ivanizag@gmail.com>"]
-edition = "2018"
+edition = "2021"
 license = "BSD-3-Clause"
 description = "Z80 and 8080 emulator"
 keywords = ["Z80", "8080", "CPM", "emulator"]

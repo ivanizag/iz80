@@ -14,9 +14,9 @@ pub struct TimedRunner {
     prev_time: Instant,
 }
 
-impl TimedRunner {
+impl Default for TimedRunner {
     /// Returns a Timed Runner instance
-    pub fn new() -> TimedRunner {
+    fn default() -> TimedRunner {
         TimedRunner {
             mhz: 0.0,
             quantum_cycles: 0,
@@ -24,8 +24,10 @@ impl TimedRunner {
             prev_time: Instant::now(),
         }
     }
+}
 
-    /// Define a new CPU speed in MHz
+impl TimedRunner {
+        /// Define a new CPU speed in MHz
     pub fn set_mhz(&mut self, cpu: &Cpu, mhz: f64, quantum_cycles: u64) {
         self.mhz = mhz;
         self.quantum_cycles = quantum_cycles;

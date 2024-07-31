@@ -20,7 +20,7 @@ const MHZ: f64 = 4.0;
 fn main() {
     let mut machine = VilleMachine::new();
     let mut cpu = Cpu::new();
-    let mut timed_runner = TimedRunner::new();
+    let mut timed_runner = TimedRunner::default();
     timed_runner.set_mhz(&cpu, MHZ, 1000);
 
     // Init console
