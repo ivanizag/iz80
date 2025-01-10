@@ -1,3 +1,5 @@
+use std::io;
+
 use super::decoder_z80::DecoderZ80;
 use super::decoder_8080::Decoder8080;
 use super::environment::Environment;
@@ -191,6 +193,16 @@ impl Cpu {
     /// Returns the current cycle count
     pub fn cycle_count(&self) -> u64 {
         self.state.cycle
+    }
+
+    // Serialize the current state of the CPU
+    pub fn serialize(&self) -> Vec<u8> {
+        self.state.serialize()
+    }
+
+    // Update the CPU state from a serialized state
+    pub fn deserialize(&mut self, data: &[u8]) -> io::Result<()> {
+        self.state.deserialize(data)
     }
 }
 

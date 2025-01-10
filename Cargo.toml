@@ -1,6 +1,6 @@
 [package]
 name = "iz80"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Ivan Izaguirre <ivanizag@gmail.com>"]
 edition = "2021"
 license = "BSD-3-Clause"
