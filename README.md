@@ -22,14 +22,14 @@ cargo test --release -- --nocapture --ignored --test ex8080
 To run Tiny Basic (from [cpuville](http://cpuville.com/Kits/Z80-kits-home.html)):
 
 ```shell
-cargo run --bin cpuville
+cargo run --examples cpuville
 ```
 
 ## Usage
 
-See [cpuville.rs](src/bin/cpuville.rs) or the CP/M 2.2 emulator [iz-cpm](https://github.com/ivanizag/iz-cpm) for more usage examples.
+See [cpuville.rs](examples/cpuville.rs) or the CP/M 2.2 emulator [iz-cpm](https://github.com/ivanizag/iz-cpm) for more usage examples.
 
-To run this example, execute: `cargo run --bin simplest`
+To run this example, execute: `cargo run --example simplest`
 
 ```rust
 use iz80::*;
