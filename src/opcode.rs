@@ -1,7 +1,7 @@
 use super::environment::Environment;
 use super::registers::Reg16;
 
-type OpcodeFn = dyn Fn(&mut Environment);
+type OpcodeFn = dyn Fn(&mut Environment) + Send + Sync;
 
 pub struct Opcode {
     pub name: String,
@@ -12,7 +12,7 @@ pub struct Opcode {
 
 impl Opcode {
     pub(crate) fn new<T>(name: String, action: T) -> Opcode
-        where T: Fn(&mut Environment) + 'static {
+        where T: Fn(&mut Environment) + Send + Sync + 'static {
         Opcode {
             name,
             cycles: 0,

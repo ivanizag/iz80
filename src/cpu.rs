@@ -17,8 +17,14 @@ const NMI_ADDRESS: u16 = 0x0066;
 pub struct Cpu {
     state: State,
     trace: bool,
-    decoder: Box<dyn Decoder>,
+    decoder: Box<dyn Decoder + Send + Sync>,
 }
+
+// Ensure that the Cpu is Send and Sync and can be used with async code
+const _: () = {
+    fn assert_send<T: Send + Sync>() {}
+    let _ = assert_send::<Cpu>;
+};
 
 pub(crate) trait Decoder {
     fn decode(&self, env: &mut Environment) -> &Opcode;
