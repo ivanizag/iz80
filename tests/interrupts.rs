@@ -1,6 +1,6 @@
 use iz80::*;
 
-const IRQ_ADDRESS: u16 = 0x0036;
+const IRQ_ADDRESS: u16 = 0x0038;
 
 #[test]
 fn test_ei() {

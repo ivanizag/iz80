@@ -8,7 +8,7 @@ use super::opcode::Opcode;
 use super::registers::{Reg16, Reg8, Registers};
 use super::state::State;
 
-const IRQ_ADDRESS: u16 = 0x0036;
+const IRQ_ADDRESS: u16 = 0x0038;
 const NMI_ADDRESS: u16 = 0x0066;
 
 /// The Z80 cpu emulator.
