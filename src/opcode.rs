@@ -25,7 +25,7 @@ impl Opcode {
         (self.action)(env);
     }
 
-    pub fn disasm(&self, env: &Environment) -> String {
+    pub fn disasm(&self, env: &mut Environment) -> String {
         let name = if self.name.contains("__index") {
             self.name.replace("__index", &env.index_description())
         } else {

@@ -16,7 +16,7 @@ impl <'a> Environment<'_> {
         }
     }
 
-    pub fn peek_pc(&self) -> u8 {
+    pub fn peek_pc(&mut self) -> u8 {
         let pc = self.state.reg.pc();
         self.sys.peek(pc)
     }
@@ -28,7 +28,7 @@ impl <'a> Environment<'_> {
         value
     }
 
-    pub fn peek16_pc(&self) -> u16 {
+    pub fn peek16_pc(&mut self) -> u16 {
         let pc = self.state.reg.pc();
         self.sys.peek16(pc)
     }
@@ -162,7 +162,7 @@ impl <'a> Environment<'_> {
         }
     }
 
-    pub fn reg8_ext(& self, reg: Reg8) -> u8 {
+    pub fn reg8_ext(&mut self, reg: Reg8) -> u8 {
         if reg == Reg8::_HL {
             self.sys.peek(self.index_address())
         } else {

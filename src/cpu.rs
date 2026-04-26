@@ -12,7 +12,7 @@ const IRQ_ADDRESS: u16 = 0x0038;
 const NMI_ADDRESS: u16 = 0x0066;
 
 /// The Z80 cpu emulator.
-/// 
+///
 /// Executes Z80 instructions changing the cpu State and Machine
 pub struct Cpu {
     state: State,
@@ -113,7 +113,7 @@ impl Cpu {
         let pc = env.state.reg.pc();
         let opcode = self.decoder.decode(&mut env);
         if self.trace {
-            print!("==> {:04x}: {:20}", pc, opcode.disasm(&env));
+            print!("==> {:04x}: {:20}", pc, opcode.disasm(&mut env));
         }
 
         env.clear_branch_taken();
@@ -141,22 +141,22 @@ impl Cpu {
     }
 
     /// Returns the instruction in PC disassembled. PC is advanced.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `sys` - A representation of the emulated machine that has the Machine trait
-    ///  
+    ///
     pub fn disasm_instruction(&mut self, sys: &mut dyn Machine) -> String {
         let mut env = Environment::new(&mut self.state, sys);
         let opcode = self.decoder.decode(&mut env);
-        opcode.disasm(&env)
+        opcode.disasm(&mut env)
     }
 
     /// Activates or deactivates traces of the instruction executed and
     /// the state of the registers.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `trace` - A bool defining the trace state to set
     pub fn set_trace(&mut self, trace: bool) {
         self.trace = trace;
@@ -211,5 +211,3 @@ impl Cpu {
         self.state.deserialize(data)
     }
 }
-
-
