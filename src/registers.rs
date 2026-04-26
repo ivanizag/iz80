@@ -36,7 +36,7 @@ pub enum Reg8 {
     SPH = 14,
     /// Low byte of SP
     SPL = 15,
-    /// Pseudo register, has to be replaced by (HL) 
+    /// Pseudo register, has to be replaced by (HL)
      _HL = 16 // Invalid
 }
 const REG_COUNT8: usize = 16;
@@ -272,7 +272,7 @@ impl Registers {
             self.put_flag(Flag::_3, reference & (1<<3) != 0);
         }
     }
-    
+
     pub(crate) fn update_undocumented_flags_block(&mut self, reference: u8) {
         if !self.mode8080 {
             // TUZD-4.2
@@ -321,7 +321,7 @@ impl Registers {
                 let b_b3 = (b & 0x08) != 0;
                 let r_b3 = (reference & 0x08) != 0;
                 #[allow(clippy::nonminimal_bool)]
-                let neg_half_bit = (!a_b3 && !b_b3 && !r_b3) || (a_b3 && !(b_b3 && r_b3)); 
+                let neg_half_bit = (!a_b3 && !b_b3 && !r_b3) || (a_b3 && !(b_b3 && r_b3));
                 self.put_flag(Flag::H, neg_half_bit);
             }
         } else {
@@ -390,7 +390,7 @@ impl Registers {
         self.im = im;
     }
 
-    pub(crate) fn get_interrupt_mode(&self) -> (bool, u8) {
+    pub fn get_interrupt_mode(&self) -> (bool, u8) {
         (self.iff1, self.im)
     }
 
@@ -471,7 +471,7 @@ mod tests {
     #[test]
     fn set_get_flag() {
         let mut r = Registers::new();
- 
+
         r.set_flag(Flag::P);
         assert!(r.get_flag(Flag::P));
         r.clear_flag(Flag::P);
