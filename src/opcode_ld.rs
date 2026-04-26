@@ -218,7 +218,7 @@ pub fn build_ex_de_hl() -> Opcode {
             let temp = env.state.reg.get16(Reg16::HL); // No IX/IY variant
             env.state.reg.set16(Reg16::HL, env.state.reg.get16(Reg16::DE));
             env.state.reg.set16(Reg16::DE, temp);
-        }     
+        }
     )
 }
 
@@ -229,7 +229,8 @@ pub fn build_ex_psp_hl() -> Opcode {
             let address = env.state.reg.get16(Reg16::SP);
 
             let temp = env.reg16_ext(Reg16::HL);
-            env.set_reg16(Reg16::HL, env.sys.peek16(address));
+            let val = env.sys.peek16(address);
+            env.set_reg16(Reg16::HL, val);
             env.sys.poke16(address, temp);
         }
     )
@@ -261,6 +262,6 @@ pub fn build_ld_block((inc, repeat, postfix) : (bool, bool, &'static str)) -> Op
                 let pc = env.state.reg.pc().wrapping_sub(2);
                 env.state.reg.set_pc(pc);
             }
-        }        
+        }
     )
 }
