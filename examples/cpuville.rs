@@ -120,7 +120,7 @@ impl VilleMachine {
 }
 
 impl Machine for VilleMachine {
-    fn peek(&self, address: u16) -> u8 {
+    fn peek(&mut self, address: u16) -> u8 {
         self.mem[address as usize]
     }
 
